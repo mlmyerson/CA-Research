@@ -1,0 +1,48 @@
+<div class="controls">
+    <label for="rule-input">Rule (0-255):</label>
+    <input type="text" id="rule-input" value="30"><br>
+
+    <label for="initial-input">Initial Pattern:</label>
+    <input type="text" id="initial-input" placeholder="e.g. 00111"><br>
+
+    <div class="mode-toggle">
+      <label>Mode:</label>
+      <input type="radio" name="mode" value="Binary" checked> Binary
+      <input type="radio" name="mode" value="RuleIndex"> Rule Index
+    </div>
+
+    <div class="boundary-row">
+      <input type="checkbox" id="toroidal-checkbox"> <label for="toroidal-checkbox">Toroidal Boundaries</label>
+    </div>
+
+    <label for="steps-slider">Generations:</label>
+    <input type="range" id="steps-slider" min="1" max="500" value="100">
+    <span id="steps-value">100</span><br><br>
+
+    <button id="run-button">Run ECA</button>
+  </div>
+
+  <div id="canvas-container">
+    <canvas id="ca-canvas" width="101" height="100"></canvas>
+  </div>
+
+  <div class="legend">
+    <div class="binary-legend" style="display:none;">
+      <h3>Binary Legend</h3>
+      <div class="legend-item"><span class="legend-swatch" style="background:white;"></span>0 → white</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:black;"></span>1 → black</div>
+    </div>
+
+    <div class="ruleindex-legend" style="display:none;">
+      <h3>Rule Index Legend</h3>
+      <div class="legend-item"><span class="legend-swatch" style="background:white;"></span>0</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:black;"></span>1</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:red;"></span>2</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:blue;"></span>3</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:green;"></span>4</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:orange;"></span>5</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:purple;"></span>6</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:yellow;"></span>7</div>
+    </div>
+  </div>
+</div>

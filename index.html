@@ -1,240 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="stylesheet" href="styles.css">
 <meta charset="UTF-8">
 <meta name="description" content="Elementary Cellular Automata Visualization">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Elementary Cellular Automata</title>
-<style>
-  body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    line-height: 1.6;
-    margin: 20px;
-    color: #333;
-    background: #fdfdfd;
-  }
-
-  h1, h2, h3 {
-    font-family: "Georgia", serif;
-    color: #2c3e50;
-    margin-bottom: 10px;
-  }
-
-  h1 {
-    font-size: 2em;
-    margin-top: 0;
-  }
-
-  .intro {
-    font-style: italic;
-    color: #7f8c8d;
-    margin-bottom: 30px;
-  }
-
-  .section {
-    margin-bottom: 40px;
-    max-width: 700px;
-  }
-
-  .section h2 {
-    border-bottom: 2px solid #bdc3c7;
-    padding-bottom: 5px;
-  }
-
-  .highlight {
-    background-color: #ecf0f1;
-    padding: 4px 8px;
-    border-radius: 3px;
-    color: #2c3e50;
-  }
-
-  .container {
-    margin: 0 auto;
-    max-width: 800px;
-  }
-
-  .controls {
-    margin-bottom: 30px;
-    background: #f7f7f7;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
-
-  .controls label {
-    display: inline-block;
-    width: 150px;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-
-  .controls input[type="text"] {
-    width: 100px;
-    margin-right: 10px;
-  }
-
-  .controls input[type="checkbox"] {
-    margin-right: 5px;
-  }
-
-  .controls .mode-toggle,
-  .controls .boundary-row {
-    margin-bottom: 10px;
-  }
-
-  #canvas-container {
-    position: relative;
-    margin-bottom: 20px;
-  }
-
-  #ca-canvas {
-    image-rendering: pixelated;
-    border: 1px solid #ccc;
-  }
-
-  .legend {
-    margin-top: 20px;
-    max-width: 400px;
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-  }
-
-  .legend-swatch {
-    display: inline-block;
-    width: 20px; 
-    height: 20px; 
-    margin-right: 10px;
-    border: 1px solid #333;
-  }
-
-  .binary-legend h3, .ruleindex-legend h3 {
-    margin-top: 0;
-  }
-
-</style>
 </head>
+
 <body>
-<div class="container">
-  <h1>Discovering Patterns with Elementary Cellular Automata</h1>
-  <p class="intro">
-    Dive into the mesmerizing world of Elementary Cellular Automata (ECAs), where simple rules 
-    ignite dazzling patterns. Experiment with binary states or explore “Rule Index” mode to 
-    uncover deeper structural rhythms.
-  </p>
 
-  <div class="section">
-    <h2>How to Use the App</h2>
-    <p>
-      1. Enter an ECA rule number (0–255) in the text box.<br>
-      2. Provide an initial pattern of <span class="highlight">0s</span> and 
-      <span class="highlight">1s</span>, or leave it blank to default to a single 
-      <span class="highlight">1</span> in the center.<br>
-      3. Select your display mode: 
-         <strong>Binary</strong> (just 0s and 1s) or 
-         <strong>Rule Index</strong> (showing integers 0–7 based on neighborhood patterns).<br>
-      4. Check the "Toroidal Boundaries" box if you want wrapping, or leave it unchecked for infinite boundaries.<br>
-      5. Use the slider to select the number of generations to run.<br>
-      6. Click <strong>Run ECA</strong> to watch the pattern unfold!
-    </p>
-  </div>
+  <div id="intro_content"></div>
+  <script>
+    fetch('intro_content.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('intro_content').innerHTML = html;
+      });
+  </script>
 
-  <div class="section">
-    <h2>What Are Elementary Cellular Automata?</h2>
-    <p>
-      ECAs are simple, one-dimensional arrays of cells evolving over time. Each cell can be 
-      on (<span class="highlight">1</span>) or off (<span class="highlight">0</span>) 
-      and updates based on a fixed rule that considers its neighbors. Despite their minimal 
-      ingredients, ECAs can produce astonishingly complex and beautiful patterns—often 
-      resembling fractals, textiles, or even suggestive of biological growth.
-    </p>
-  </div>
-
-  <div class="section">
-    <h2>How to Read the Graph</h2>
-    <p>
-      The top row is your starting pattern. Each subsequent row shows how the pattern evolves 
-      at each generation. In <strong>Binary Mode</strong>, black and white cells represent 
-      0s and 1s, giving you a direct binary readout.  
-    </p>
-    <p>
-      In <strong>Rule Index Mode</strong>, the plot uses a richer palette of colors, with 
-      each integer (0–7) representing a unique neighborhood configuration. This instantly 
-      reveals how each cell’s fate is determined by its neighbors, highlighting the 
-      intricate logic of the chosen rule.
-    </p>
-  </div>
-
-  <div class="section">
-    <h2>Why Are ECAs Cool?</h2>
-    <p>
-      ECAs are like tiny universes built from simple rules. They can mimic nature’s complexity, 
-      exhibit chaotic behavior, or produce stable, repeating motifs. Watching the transition 
-      from binary to rule index mode allows you to see the underlying code of each evolving 
-      structure. In <strong>Binary Mode</strong>, patterns emerge as a tapestry of bits, 
-      while <strong>Rule Index Mode</strong> decodes these patterns, letting you observe 
-      how each neighborhood’s configuration drives the emergence of order and disorder.
-    </p>
-    <p>
-      By experimenting with different rules and initial conditions, you can discover 
-      surprising symmetries, unpredictable growth, and breathtaking computational artistry. 
-      It’s a digital playground where mathematics, art, and complexity science collide.
-    </p>
-  </div>
-
-  <div class="controls">
-    <label for="rule-input">Rule (0-255):</label>
-    <input type="text" id="rule-input" value="30"><br>
-
-    <label for="initial-input">Initial Pattern:</label>
-    <input type="text" id="initial-input" placeholder="e.g. 00111"><br>
-
-    <div class="mode-toggle">
-      <label>Mode:</label>
-      <input type="radio" name="mode" value="Binary" checked> Binary
-      <input type="radio" name="mode" value="RuleIndex"> Rule Index
-    </div>
-
-    <div class="boundary-row">
-      <input type="checkbox" id="toroidal-checkbox"> <label for="toroidal-checkbox">Toroidal Boundaries</label>
-    </div>
-
-    <label for="steps-slider">Generations:</label>
-    <input type="range" id="steps-slider" min="1" max="500" value="100">
-    <span id="steps-value">100</span><br><br>
-
-    <button id="run-button">Run ECA</button>
-  </div>
-
-  <div id="canvas-container">
-    <canvas id="ca-canvas" width="101" height="100"></canvas>
-  </div>
-
-  <div class="legend">
-    <div class="binary-legend" style="display:none;">
-      <h3>Binary Legend</h3>
-      <div class="legend-item"><span class="legend-swatch" style="background:white;"></span>0 → white</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:black;"></span>1 → black</div>
-    </div>
-
-    <div class="ruleindex-legend" style="display:none;">
-      <h3>Rule Index Legend</h3>
-      <div class="legend-item"><span class="legend-swatch" style="background:white;"></span>0</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:black;"></span>1</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:red;"></span>2</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:blue;"></span>3</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:green;"></span>4</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:orange;"></span>5</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:purple;"></span>6</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:yellow;"></span>7</div>
-    </div>
-  </div>
-</div>
-
+<div id="controls"></div>
 <script>
+  fetch('controls.html')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('controls').innerHTML = html;
+    });
+</script>
+  
+
+<script src="ca.js"></script>
+<script>  
 // Ascending indexing convention neighborhoods
 const ASCENDING_NEIGHBORHOODS = [
   [0,0,0], // bit0
@@ -344,64 +140,6 @@ function evolveCAAscending(initial_state, rule_map, steps, toroidal) {
     ascending_history[t] = asc_line;
   }
   return ascending_history;
-}
-
-const binaryColors = {
-  0: [255,255,255],
-  1: [0,0,0]
-};
-
-const ruleIndexColors = {
-  0: [255,255,255],
-  1: [0,0,0],
-  2: [255,0,0],
-  3: [0,0,255],
-  4: [0,128,0],
-  5: [255,165,0],
-  6: [128,0,128],
-  7: [255,255,0]
-};
-
-function drawCA(history, mode) {
-  let steps = history.length;
-  let width = history[0].length;
-  const canvas = document.getElementById('ca-canvas');
-  canvas.width = width;
-  canvas.height = steps;
-  const ctx = canvas.getContext('2d');
-  let imageData = ctx.createImageData(width, steps);
-  let data = imageData.data;
-
-  if (mode === 'Binary') {
-    for (let y=0; y<steps; y++) {
-      for (let x=0; x<width; x++) {
-        let c = binaryColors[history[y][x]];
-        let idx = (y*width + x)*4;
-        data[idx] = c[0];
-        data[idx+1] = c[1];
-        data[idx+2] = c[2];
-        data[idx+3] = 255;
-      }
-    }
-  } else {
-    for (let y=0; y<steps; y++) {
-      for (let x=0; x<width; x++) {
-        let c = ruleIndexColors[history[y][x]];
-        let idx = (y*width + x)*4;
-        data[idx] = c[0];
-        data[idx+1] = c[1];
-        data[idx+2] = c[2];
-        data[idx+3] = 255;
-      }
-    }
-  }
-
-  ctx.putImageData(imageData, 0, 0);
-
-  // Scale factor for a larger output
-  const scaleFactor = 4;
-  canvas.style.width = (width * scaleFactor) + "px";
-  canvas.style.height = (steps * scaleFactor) + "px";
 }
 
 document.getElementById('steps-slider').addEventListener('input', (e)=>{
