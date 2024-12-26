@@ -9,6 +9,24 @@
 </head>
 
 <body>
+  <script>
+  // Ascending indexing convention neighborhoods
+  const ASCENDING_NEIGHBORHOODS = [
+      [0,0,0], // bit0
+      [0,0,1], // bit1
+      [0,1,0], // bit2
+      [0,1,1], // bit3
+      [1,0,0], // bit4
+      [1,0,1], // bit5
+      [1,1,0], // bit6
+      [1,1,1]  // bit7
+];
+  </script>
+
+  <script src="controls.js"></script>
+  <script src="ca.js"></script>
+  <script src="simulation.js"></script>
+
 
   <div id="intro_content"></div>
   <script>
@@ -25,156 +43,9 @@
     .then(response => response.text())
     .then(html => {
       document.getElementById('controls').innerHTML = html;
+      initControls(); // Now set up the listeners
     });
 </script>
-  
 
-<script src="ca.js"></script>
-<script>  
-// Ascending indexing convention neighborhoods
-const ASCENDING_NEIGHBORHOODS = [
-  [0,0,0], // bit0
-  [0,0,1], // bit1
-  [0,1,0], // bit2
-  [0,1,1], // bit3
-  [1,0,0], // bit4
-  [1,0,1], // bit5
-  [1,1,0], // bit6
-  [1,1,1]  // bit7
-];
-
-function generateAscendingRuleMap(rule_number) {
-  let rule_binary = rule_number.toString(2).padStart(8,'0');
-  let rule_map = {};
-  for (let i=0; i<8; i++) {
-    let nb = ASCENDING_NEIGHBORHOODS[i];
-    let bit_val = parseInt(rule_binary[7 - i], 10);
-    rule_map[nb.join('')] = bit_val;
-  }
-  return rule_map;
-}
-
-function createInitialState(width, pattern) {
-  let initial = new Array(width).fill(0);
-  if (pattern && /^[01]+$/.test(pattern)) {
-    let p_len = pattern.length;
-    let start = Math.floor(width/2 - p_len/2);
-    for (let i=0; i<p_len; i++) {
-      initial[start+i] = parseInt(pattern[i],10);
-    }
-  } else {
-    initial[Math.floor(width/2)] = 1;
-  }
-  return initial;
-}
-
-function getNeighborsBinary(line, toroidal) {
-  let width = line.length;
-  let left = new Array(width);
-  let right = new Array(width);
-
-  if (toroidal) {
-    for (let i=0; i<width; i++) {
-      left[i] = line[(i-1+width)%width];
-      right[i] = line[(i+1)%width];
-    }
-  } else {
-    for (let i=0; i<width; i++) {
-      left[i] = (i>0) ? line[i-1] : 0;
-      right[i] = (i<width-1) ? line[i+1] : 0;
-    }
-  }
-
-  return [left, line, right];
-}
-
-function evolveCABinary(initial_state, rule_map, steps, toroidal) {
-  let width = initial_state.length;
-  let history = new Array(steps);
-  history[0] = initial_state.slice();
-  for (let t=1; t<steps; t++) {
-    let prev = history[t-1];
-    let [left, center, right] = getNeighborsBinary(prev, toroidal);
-    let new_line = new Array(width);
-    for (let i=0; i<width; i++) {
-      let nb = [left[i], center[i], right[i]];
-      let a_idx = (nb[0]<<2)|(nb[1]<<1)|nb[2];
-      let key = ASCENDING_NEIGHBORHOODS[a_idx].join('');
-      new_line[i] = rule_map[key];
-    }
-    history[t] = new_line;
-  }
-  return history;
-}
-
-function evolveCAAscending(initial_state, rule_map, steps, toroidal) {
-  let width = initial_state.length;
-  let binary_states = new Array(steps);
-  let ascending_history = new Array(steps);
-
-  binary_states[0] = initial_state.slice();
-  {
-    let [left, center, right] = getNeighborsBinary(binary_states[0], toroidal);
-    let line = new Array(width);
-    for (let i=0; i<width; i++) {
-      let nb = [left[i], center[i], right[i]];
-      let a_idx = (nb[0]<<2)|(nb[1]<<1)|nb[2];
-      line[i] = a_idx;
-    }
-    ascending_history[0] = line;
-  }
-
-  for (let t=1; t<steps; t++) {
-    let prev = binary_states[t-1];
-    let [left, center, right] = getNeighborsBinary(prev, toroidal);
-    let new_line = new Array(width);
-    let asc_line = new Array(width);
-    for (let i=0; i<width; i++) {
-      let nb = [left[i], center[i], right[i]];
-      let a_idx = (nb[0]<<2)|(nb[1]<<1)|nb[2];
-      let key = ASCENDING_NEIGHBORHOODS[a_idx].join('');
-      new_line[i] = rule_map[key];
-      asc_line[i] = a_idx;
-    }
-    binary_states[t] = new_line;
-    ascending_history[t] = asc_line;
-  }
-  return ascending_history;
-}
-
-document.getElementById('steps-slider').addEventListener('input', (e)=>{
-  document.getElementById('steps-value').textContent = e.target.value;
-});
-
-document.getElementById('run-button').addEventListener('click', ()=>{
-  let ruleVal = document.getElementById('rule-input').value.trim();
-  let rule = parseInt(ruleVal,10);
-  if (isNaN(rule) || rule < 0 || rule > 255) {
-    rule = 30; // default if invalid
-  }
-
-  const initPattern = document.getElementById('initial-input').value.trim();
-  const mode = document.querySelector('input[name="mode"]:checked').value;
-  const toroidal = document.getElementById('toroidal-checkbox').checked;
-  const steps = parseInt(document.getElementById('steps-slider').value,10);
-
-  const rule_map = generateAscendingRuleMap(rule);
-  const width = 101;
-  const initial_state = createInitialState(width, initPattern);
-
-  let history;
-  if (mode === 'Binary') {
-    history = evolveCABinary(initial_state, rule_map, steps, toroidal);
-    drawCA(history, 'Binary');
-    document.querySelector('.binary-legend').style.display = 'block';
-    document.querySelector('.ruleindex-legend').style.display = 'none';
-  } else {
-    history = evolveCAAscending(initial_state, rule_map, steps, toroidal);
-    drawCA(history, 'RuleIndex');
-    document.querySelector('.binary-legend').style.display = 'none';
-    document.querySelector('.ruleindex-legend').style.display = 'block';
-  }
-});
-</script>
 </body>
 </html>
