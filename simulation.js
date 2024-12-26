@@ -29,19 +29,19 @@ function generateAscendingRuleMap(rule_number) {
     let left = new Array(width);
     let right = new Array(width);
   
-    if (toroidal) {
-      for (let i=0; i<width; i++) {
-        left[i] = line[(i-1+width)%width];
-        right[i] = line[(i+1)%width];
+    if (!toroidal) {
+      for (let i = 0; i < width; i++) {
+        left[i] = line[(i - 1 + width) % width];
+        right[i] = line[(i + 1) % width];
       }
     } else {
-      for (let i=0; i<width; i++) {
-        left[i] = (i>0) ? line[i-1] : 0;
-        right[i] = (i<width-1) ? line[i+1] : 0;
+      for (let i = 0; i < width; i++) {
+        left[i] = (i - 1 >= 0) ? line[i - 1] : 0;
+        right[i] = (i + 1 < width) ? line[i + 1] : 0;
       }
     }
   
-    return [left, line, right];
+    return { left, right };
   }
   
   function evolveCABinary(initial_state, rule_map, steps, toroidal) {
@@ -50,10 +50,10 @@ function generateAscendingRuleMap(rule_number) {
     history[0] = initial_state.slice();
     for (let t=1; t<steps; t++) {
       let prev = history[t-1];
-      let [left, center, right] = getNeighborsBinary(prev, toroidal);
+      let { left, right } = getNeighborsBinary(prev, toroidal);
       let new_line = new Array(width);
       for (let i=0; i<width; i++) {
-        let nb = [left[i], center[i], right[i]];
+        let nb = [left[i], prev[i], right[i]];
         let a_idx = (nb[0]<<2)|(nb[1]<<1)|nb[2];
         let key = ASCENDING_NEIGHBORHOODS[a_idx].join('');
         new_line[i] = rule_map[key];
@@ -70,10 +70,10 @@ function generateAscendingRuleMap(rule_number) {
   
     binary_states[0] = initial_state.slice();
     {
-      let [left, center, right] = getNeighborsBinary(binary_states[0], toroidal);
+      let { left, right } = getNeighborsBinary(binary_states[0], toroidal);
       let line = new Array(width);
       for (let i=0; i<width; i++) {
-        let nb = [left[i], center[i], right[i]];
+        let nb = [left[i], binary_states[0][i], right[i]];
         let a_idx = (nb[0]<<2)|(nb[1]<<1)|nb[2];
         line[i] = a_idx;
       }
@@ -82,11 +82,11 @@ function generateAscendingRuleMap(rule_number) {
   
     for (let t=1; t<steps; t++) {
       let prev = binary_states[t-1];
-      let [left, center, right] = getNeighborsBinary(prev, toroidal);
+      let { left, right } = getNeighborsBinary(prev, toroidal);
       let new_line = new Array(width);
       let asc_line = new Array(width);
       for (let i=0; i<width; i++) {
-        let nb = [left[i], center[i], right[i]];
+        let nb = [left[i], prev[i], right[i]];
         let a_idx = (nb[0]<<2)|(nb[1]<<1)|nb[2];
         let key = ASCENDING_NEIGHBORHOODS[a_idx].join('');
         new_line[i] = rule_map[key];
