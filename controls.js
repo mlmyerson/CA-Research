@@ -32,4 +32,34 @@ function initControls() {
       document.querySelector('.ruleindex-legend').style.display = 'block';
     }
   });
+
+  // Add fullscreen button handler
+  document.getElementById('fullscreen-button').addEventListener('click', () => {
+    enterFullscreenMode();
+  });
+
+  // Initialize fullscreen controls when they become available
+  setTimeout(initFullscreenControls, 100);
+}
+
+function initFullscreenControls() {
+  // Fullscreen steps slider
+  const fsStepsSlider = document.getElementById('fs-steps-slider');
+  if (fsStepsSlider) {
+    fsStepsSlider.addEventListener('input', (e) => {
+      document.getElementById('fs-steps-value').textContent = e.target.value;
+    });
+  }
+
+  // Fullscreen run button
+  const fsRunButton = document.getElementById('fs-run-button');
+  if (fsRunButton) {
+    fsRunButton.addEventListener('click', runFullscreenECA);
+  }
+
+  // Exit fullscreen button
+  const exitButton = document.getElementById('exit-fullscreen-button');
+  if (exitButton) {
+    exitButton.addEventListener('click', exitFullscreenMode);
+  }
 }

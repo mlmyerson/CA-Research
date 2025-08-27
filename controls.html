@@ -20,11 +20,22 @@
     <input type="range" id="steps-slider" min="1" max="500" value="100" style="margin: 8px 0; width: 100%;">
     <span id="steps-value">100</span><br><br>
 
-    <button id="run-button" style="margin-top: 8px; cursor: pointer; background: #007bff; color: #fff; border: none; padding: 12px 24px; border-radius: 4px; font-size: 1.2em;">Run ECA</button>
+    <button id="run-button" style="margin-top: 8px; margin-right: 10px; cursor: pointer; background: #007bff; color: #fff; border: none; padding: 12px 24px; border-radius: 4px; font-size: 1.2em;">Run ECA</button>
+    <button id="fullscreen-button" style="margin-top: 8px; cursor: pointer; background: #28a745; color: #fff; border: none; padding: 12px 24px; border-radius: 4px; font-size: 1.2em;">Fullscreen</button>
   </div>
 
   <div id="canvas-container" style="display: flex; width: 100%; text-align: center;">
-    <canvas id="ca-canvas" width="700" height="500" style="border: 1px solid #ddd;"></canvas>
+    <div style="position: relative; flex-grow: 1;">
+      <canvas id="ca-canvas" width="700" height="500" style="border: 1px solid #ddd;"></canvas>
+      <div id="canvas-controls" style="position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); padding: 8px; border-radius: 4px; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div><strong>Controls:</strong></div>
+        <div>• Mouse wheel: Zoom</div>
+        <div>• Drag: Pan</div>
+        <div>• F: Fullscreen</div>
+        <div>• R: Reset view</div>
+        <div>• +/-: Zoom in/out</div>
+      </div>
+    </div>
     <div class="legend" style="width: 200px; text-align: left; margin-left: 20px;">
       <div class="binary-legend" style="display:none;">
         <h3>Binary Legend</h3>

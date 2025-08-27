@@ -28,24 +28,61 @@
   <script src="simulation.js"></script>
 
 
-  <div id="intro_content"></div>
-  <script>
-    fetch('intro_content.html')
-      .then(response => response.text())
-      .then(html => {
-        document.getElementById('intro_content').innerHTML = html;
-      });
-  </script>
+  <!-- Normal View -->
+  <div id="normal-view">
+    <div id="intro_content"></div>
+    <script>
+      fetch('intro_content.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('intro_content').innerHTML = html;
+        });
+    </script>
 
-<div id="controls"></div>
-<script>
-  fetch('controls.html')
-    .then(response => response.text())
-    .then(html => {
-      document.getElementById('controls').innerHTML = html;
-      initControls(); // Now set up the listeners
-    });
-</script>
+    <div id="controls"></div>
+    <script>
+      fetch('controls.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('controls').innerHTML = html;
+          initControls(); // Now set up the listeners
+        });
+    </script>
+  </div>
+
+  <!-- Fullscreen View -->
+  <div id="fullscreen-view" style="display: none;">
+    <div id="fs-menubar">
+      <div class="fs-menubar-content">
+        <div class="fs-controls">
+          <label>Rule:</label>
+          <input type="text" id="fs-rule-input" value="30">
+          <label>Pattern:</label>
+          <input type="text" id="fs-initial-input" placeholder="e.g. 00111">
+          <label>Mode:</label>
+          <input type="radio" name="fs-mode" value="Binary" checked> Binary
+          <input type="radio" name="fs-mode" value="RuleIndex"> Rule Index
+          <label>Generations:</label>
+          <input type="range" id="fs-steps-slider" min="1" max="500" value="100">
+          <span id="fs-steps-value">100</span>
+          <input type="checkbox" id="fs-toroidal-checkbox" checked> Toroidal
+          <button id="fs-run-button">Run</button>
+        </div>
+        <button id="exit-fullscreen-button">Exit Fullscreen</button>
+      </div>
+    </div>
+    <div id="fs-canvas-container">
+      <canvas id="fs-ca-canvas"></canvas>
+      <div id="fs-canvas-controls">
+        <div><strong>Controls:</strong></div>
+        <div>• Mouse wheel: Zoom</div>
+        <div>• Drag: Pan</div>
+        <div>• R: Reset view</div>
+        <div>• +/-: Zoom in/out</div>
+        <div>• ESC: Exit fullscreen</div>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>

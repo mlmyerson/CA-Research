@@ -82,6 +82,164 @@ body {
   #ca-canvas {
     image-rendering: pixelated;
     border: 1px solid #ccc;
+    outline: none; /* Remove focus outline */
+  }
+
+  #ca-canvas:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+  }
+
+  /* Fullscreen overlay styles */
+  #canvas-fullscreen-overlay {
+    overflow: hidden;
+  }
+
+  #fullscreen-instruction {
+    user-select: none;
+    pointer-events: none;
+  }
+
+  #transform-status {
+    user-select: none;
+    z-index: 10;
+  }
+
+  #canvas-controls {
+    user-select: none;
+    transition: opacity 0.3s ease;
+  }
+
+  #canvas-controls:hover {
+    opacity: 1 !important;
+  }
+
+  /* Hide controls when canvas is being dragged */
+  .canvas-dragging #canvas-controls {
+    opacity: 0.3;
+  }
+
+  /* Fullscreen View Styles */
+  #fullscreen-view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #1a1a1a;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #fs-menubar {
+    background: #2d2d2d;
+    border-bottom: 1px solid #444;
+    padding: 8px 16px;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .fs-menubar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .fs-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .fs-controls label {
+    font-weight: bold;
+    font-size: 12px;
+    margin: 0;
+  }
+
+  .fs-controls input[type="text"] {
+    width: 60px;
+    padding: 4px 6px;
+    border: 1px solid #555;
+    background: #3a3a3a;
+    color: white;
+    border-radius: 3px;
+    font-size: 12px;
+  }
+
+  .fs-controls input[type="range"] {
+    width: 100px;
+  }
+
+  .fs-controls input[type="checkbox"] {
+    margin: 0 4px 0 0;
+  }
+
+  .fs-controls button, #exit-fullscreen-button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.2s;
+  }
+
+  #exit-fullscreen-button {
+    background: #dc3545;
+  }
+
+  .fs-controls button:hover, #exit-fullscreen-button:hover {
+    opacity: 0.9;
+  }
+
+  #fs-canvas-container {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  #fs-ca-canvas {
+    image-rendering: pixelated;
+    border: 1px solid #555;
+    background: white;
+    max-width: 95vw;
+    max-height: calc(95vh - 60px);
+    outline: none;
+  }
+
+  #fs-ca-canvas:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+  }
+
+  #fs-canvas-controls {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    user-select: none;
+    transition: opacity 0.3s ease;
+  }
+
+  #fs-canvas-controls:hover {
+    opacity: 1 !important;
+  }
+
+  .canvas-dragging #fs-canvas-controls {
+    opacity: 0.3;
   }
 
   .legend {
