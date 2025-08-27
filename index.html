@@ -46,42 +46,12 @@
           <input type="checkbox" id="toroidal-checkbox" checked> Toroidal
           <button id="run-button">Run ECA</button>
         </div>
-        <button id="info-button">Info</button>
-      </div>
-    </div>
-    <div id="canvas-container">
-      <canvas id="ca-canvas"></canvas>
-      <div id="canvas-controls">
-        <div><strong>Controls:</strong></div>
-        <div>• Mouse wheel: Zoom</div>
-        <div>• Drag: Pan</div>
-        <div>• R: Reset view</div>
-        <div>• +/-: Zoom in/out</div>
-        <div>• I: Toggle info</div>
       </div>
     </div>
   </div>
 
-  <!-- Info Modal -->
-  <div id="info-modal" style="display: none;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Elementary Cellular Automata</h2>
-        <button id="close-info-button">&times;</button>
-      </div>
-      <div id="info-content"></div>
-    </div>
-  </div>
 
   <script>
-    // Load info content
-    fetch('intro_content.html')
-      .then(response => response.text())
-      .then(html => {
-        document.getElementById('info-content').innerHTML = html;
-      });
-    
-    // Initialize controls
     initControls();
   </script>
 

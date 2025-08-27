@@ -7,11 +7,6 @@ function initControls() {
   // Run button
   document.getElementById('run-button').addEventListener('click', runECA);
 
-  // Info button
-  document.getElementById('info-button').addEventListener('click', () => {
-    toggleInfoModal();
-  });
-
   // Close info modal button
   document.getElementById('close-info-button').addEventListener('click', () => {
     closeInfoModal();
