@@ -92,10 +92,19 @@ body {
   justify-content: center;
   align-items: center;
   background: #1a1a1a;
+  overflow: auto;
+  position: relative;
 }
 
 #ca-canvas {
   image-rendering: pixelated;
   border: 1px solid #555;
   background: white;
+  display: block;
+  margin: auto;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: contain;
+  cursor: grab;
+  user-select: none;
 }

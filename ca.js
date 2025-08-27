@@ -14,8 +14,11 @@ const ruleIndexColors = {
   7: [255,255,0]
 };
 
-// Simple zoom state
+// Simple zoom and pan state
 let zoomLevel = 1;
+let isPanning = false;
+let lastPanX = 0;
+let lastPanY = 0;
 
 function drawCA(history, mode) {
     let steps = history.length;
@@ -53,10 +56,24 @@ function drawCA(history, mode) {
   
     ctx.putImageData(imageData, 0, 0);
   
-    // Set up mouse wheel zoom if not already done
-    if (!canvas.hasZoomListener) {
+    // Reset zoom level for new patterns
+    zoomLevel = 1;
+  
+    // Set up mouse interactions if not already done
+    if (!canvas.hasInteractions) {
+      // Mouse wheel for zoom only
       canvas.addEventListener('wheel', handleZoom, { passive: false });
-      canvas.hasZoomListener = true;
+      
+      // Mouse drag for panning
+      canvas.addEventListener('mousedown', handlePanStart);
+      canvas.addEventListener('mousemove', handlePanMove);
+      canvas.addEventListener('mouseup', handlePanEnd);
+      canvas.addEventListener('mouseleave', handlePanEnd);
+      
+      // Prevent context menu
+      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+      
+      canvas.hasInteractions = true;
     }
     
     // Apply current zoom and center the canvas
@@ -66,26 +83,83 @@ function drawCA(history, mode) {
 function handleZoom(e) {
   e.preventDefault();
   
+  const container = document.getElementById('canvas-container');
+  const canvas = document.getElementById('ca-canvas');
+  
+  // Calculate the center of the current viewport before zoom
+  const viewCenterX = (container.scrollLeft + container.clientWidth / 2) / canvas.offsetWidth;
+  const viewCenterY = (container.scrollTop + container.clientHeight / 2) / canvas.offsetHeight;
+  
   const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+  const oldZoomLevel = zoomLevel;
   zoomLevel = Math.max(0.1, Math.min(10, zoomLevel * zoomFactor));
   
-  applyZoom();
+  applyZoom(viewCenterX, viewCenterY);
 }
 
-function applyZoom() {
+function applyZoom(centerX = 0.5, centerY = 0.5) {
   const canvas = document.getElementById('ca-canvas');
-  if (!canvas) return;
+  const container = document.getElementById('canvas-container');
+  if (!canvas || !container) return;
   
-  // Fill the available screen space while maintaining aspect ratio, then apply zoom
-  const containerWidth = window.innerWidth;
-  const containerHeight = window.innerHeight - 60; // Account for menubar
+  // Get the container's available space
+  const containerWidth = container.clientWidth;
+  const containerHeight = container.clientHeight;
   
+  // Calculate base scale to fit the canvas in the container
   const scaleX = containerWidth / canvas.width;
   const scaleY = containerHeight / canvas.height;
   const baseScale = Math.min(scaleX, scaleY);
   
+  // Apply zoom on top of base scale
   const finalScale = baseScale * zoomLevel;
   
   canvas.style.width = (canvas.width * finalScale) + "px";
   canvas.style.height = (canvas.height * finalScale) + "px";
+  
+  // Adjust scroll position to maintain the center point
+  const newScrollLeft = (centerX * canvas.offsetWidth) - (containerWidth / 2);
+  const newScrollTop = (centerY * canvas.offsetHeight) - (containerHeight / 2);
+  
+  container.scrollLeft = Math.max(0, newScrollLeft);
+  container.scrollTop = Math.max(0, newScrollTop);
+}
+
+function handlePanStart(e) {
+  if (e.button === 0) { // Left mouse button only
+    isPanning = true;
+    lastPanX = e.clientX;
+    lastPanY = e.clientY;
+    
+    const canvas = document.getElementById('ca-canvas');
+    canvas.style.cursor = 'grabbing';
+    
+    e.preventDefault();
+  }
+}
+
+function handlePanMove(e) {
+  if (!isPanning) return;
+  
+  const container = document.getElementById('canvas-container');
+  const deltaX = e.clientX - lastPanX;
+  const deltaY = e.clientY - lastPanY;
+  
+  // Pan by adjusting scroll position
+  container.scrollLeft -= deltaX;
+  container.scrollTop -= deltaY;
+  
+  lastPanX = e.clientX;
+  lastPanY = e.clientY;
+  
+  e.preventDefault();
+}
+
+function handlePanEnd(e) {
+  if (isPanning) {
+    isPanning = false;
+    
+    const canvas = document.getElementById('ca-canvas');
+    canvas.style.cursor = 'grab';
+  }
 }
