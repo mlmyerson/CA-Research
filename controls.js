@@ -6,18 +6,6 @@ function initControls() {
 
   // Run button
   document.getElementById('run-button').addEventListener('click', runECA);
-
-  // Close info modal button
-  document.getElementById('close-info-button').addEventListener('click', () => {
-    closeInfoModal();
-  });
-
-  // Close modal when clicking outside
-  document.getElementById('info-modal').addEventListener('click', (e) => {
-    if (e.target.id === 'info-modal') {
-      closeInfoModal();
-    }
-  });
 }
 
 function runECA() {

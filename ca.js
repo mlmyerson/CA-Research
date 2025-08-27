@@ -50,8 +50,14 @@ function drawCA(history, mode) {
   
     ctx.putImageData(imageData, 0, 0);
   
-    // Scale factor for a larger output
-    const scaleFactor = 4;
-    canvas.style.width = (width * scaleFactor) + "px";
-    canvas.style.height = (steps * scaleFactor) + "px";
+    // Fill the available screen space while maintaining aspect ratio
+    const containerWidth = window.innerWidth;
+    const containerHeight = window.innerHeight - 60; // Account for menubar
+    
+    const scaleX = containerWidth / width;
+    const scaleY = containerHeight / steps;
+    const scale = Math.min(scaleX, scaleY);
+    
+    canvas.style.width = (width * scale) + "px";
+    canvas.style.height = (steps * scale) + "px";
   }
