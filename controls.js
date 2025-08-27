@@ -1,65 +1,52 @@
 function initControls() {
+  // Steps slider
   document.getElementById('steps-slider').addEventListener('input', (e) => {
     document.getElementById('steps-value').textContent = e.target.value;
   });
 
-  document.getElementById('run-button').addEventListener('click', () => {
-    let ruleVal = document.getElementById('rule-input').value.trim();
-    let rule = parseInt(ruleVal, 10);
-    if (isNaN(rule) || rule < 0 || rule > 255) {
-      rule = 30; // default if invalid
-    }
+  // Run button
+  document.getElementById('run-button').addEventListener('click', runECA);
 
-    const initPattern = document.getElementById('initial-input').value.trim();
-    const mode = document.querySelector('input[name="mode"]:checked').value;
-    const toroidal = document.getElementById('toroidal-checkbox').checked; 
-    const steps = parseInt(document.getElementById('steps-slider').value, 10);
-
-    const rule_map = generateAscendingRuleMap(rule);
-    const width = 101;
-    const initial_state = createInitialState(width, initPattern);
-
-    let history;
-    if (mode === 'Binary') {
-      history = evolveCABinary(initial_state, rule_map, steps, toroidal);
-      drawCA(history, 'Binary');
-      document.querySelector('.binary-legend').style.display = 'block';
-      document.querySelector('.ruleindex-legend').style.display = 'none';
-    } else {
-      history = evolveCAAscending(initial_state, rule_map, steps, toroidal);
-      drawCA(history, 'RuleIndex');
-      document.querySelector('.binary-legend').style.display = 'none';
-      document.querySelector('.ruleindex-legend').style.display = 'block';
-    }
+  // Info button
+  document.getElementById('info-button').addEventListener('click', () => {
+    toggleInfoModal();
   });
 
-  // Add fullscreen button handler
-  document.getElementById('fullscreen-button').addEventListener('click', () => {
-    enterFullscreenMode();
+  // Close info modal button
+  document.getElementById('close-info-button').addEventListener('click', () => {
+    closeInfoModal();
   });
 
-  // Initialize fullscreen controls when they become available
-  setTimeout(initFullscreenControls, 100);
+  // Close modal when clicking outside
+  document.getElementById('info-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'info-modal') {
+      closeInfoModal();
+    }
+  });
 }
 
-function initFullscreenControls() {
-  // Fullscreen steps slider
-  const fsStepsSlider = document.getElementById('fs-steps-slider');
-  if (fsStepsSlider) {
-    fsStepsSlider.addEventListener('input', (e) => {
-      document.getElementById('fs-steps-value').textContent = e.target.value;
-    });
+function runECA() {
+  let ruleVal = document.getElementById('rule-input').value.trim();
+  let rule = parseInt(ruleVal, 10);
+  if (isNaN(rule) || rule < 0 || rule > 255) {
+    rule = 30; // default if invalid
   }
 
-  // Fullscreen run button
-  const fsRunButton = document.getElementById('fs-run-button');
-  if (fsRunButton) {
-    fsRunButton.addEventListener('click', runFullscreenECA);
-  }
+  const initPattern = document.getElementById('initial-input').value.trim();
+  const mode = document.querySelector('input[name="mode"]:checked').value;
+  const toroidal = document.getElementById('toroidal-checkbox').checked; 
+  const steps = parseInt(document.getElementById('steps-slider').value, 10);
 
-  // Exit fullscreen button
-  const exitButton = document.getElementById('exit-fullscreen-button');
-  if (exitButton) {
-    exitButton.addEventListener('click', exitFullscreenMode);
+  const rule_map = generateAscendingRuleMap(rule);
+  const width = 101;
+  const initial_state = createInitialState(width, initPattern);
+
+  let history;
+  if (mode === 'Binary') {
+    history = evolveCABinary(initial_state, rule_map, steps, toroidal);
+  } else {
+    history = evolveCAAscending(initial_state, rule_map, steps, toroidal);
   }
+  
+  drawCA(history, mode);
 }

@@ -28,61 +28,62 @@
   <script src="simulation.js"></script>
 
 
-  <!-- Normal View -->
-  <div id="normal-view">
-    <div id="intro_content"></div>
-    <script>
-      fetch('intro_content.html')
-        .then(response => response.text())
-        .then(html => {
-          document.getElementById('intro_content').innerHTML = html;
-        });
-    </script>
-
-    <div id="controls"></div>
-    <script>
-      fetch('controls.html')
-        .then(response => response.text())
-        .then(html => {
-          document.getElementById('controls').innerHTML = html;
-          initControls(); // Now set up the listeners
-        });
-    </script>
-  </div>
-
-  <!-- Fullscreen View -->
-  <div id="fullscreen-view" style="display: none;">
-    <div id="fs-menubar">
-      <div class="fs-menubar-content">
-        <div class="fs-controls">
+  <!-- Main Application View -->
+  <div id="main-view">
+    <div id="menubar">
+      <div class="menubar-content">
+        <div class="controls">
           <label>Rule:</label>
-          <input type="text" id="fs-rule-input" value="30">
+          <input type="text" id="rule-input" value="30">
           <label>Pattern:</label>
-          <input type="text" id="fs-initial-input" placeholder="e.g. 00111">
+          <input type="text" id="initial-input" placeholder="e.g. 00111">
           <label>Mode:</label>
-          <input type="radio" name="fs-mode" value="Binary" checked> Binary
-          <input type="radio" name="fs-mode" value="RuleIndex"> Rule Index
+          <input type="radio" name="mode" value="Binary" checked> Binary
+          <input type="radio" name="mode" value="RuleIndex"> Rule Index
           <label>Generations:</label>
-          <input type="range" id="fs-steps-slider" min="1" max="500" value="100">
-          <span id="fs-steps-value">100</span>
-          <input type="checkbox" id="fs-toroidal-checkbox" checked> Toroidal
-          <button id="fs-run-button">Run</button>
+          <input type="range" id="steps-slider" min="1" max="500" value="100">
+          <span id="steps-value">100</span>
+          <input type="checkbox" id="toroidal-checkbox" checked> Toroidal
+          <button id="run-button">Run ECA</button>
         </div>
-        <button id="exit-fullscreen-button">Exit Fullscreen</button>
+        <button id="info-button">Info</button>
       </div>
     </div>
-    <div id="fs-canvas-container">
-      <canvas id="fs-ca-canvas"></canvas>
-      <div id="fs-canvas-controls">
+    <div id="canvas-container">
+      <canvas id="ca-canvas"></canvas>
+      <div id="canvas-controls">
         <div><strong>Controls:</strong></div>
         <div>• Mouse wheel: Zoom</div>
         <div>• Drag: Pan</div>
         <div>• R: Reset view</div>
         <div>• +/-: Zoom in/out</div>
-        <div>• ESC: Exit fullscreen</div>
+        <div>• I: Toggle info</div>
       </div>
     </div>
   </div>
+
+  <!-- Info Modal -->
+  <div id="info-modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Elementary Cellular Automata</h2>
+        <button id="close-info-button">&times;</button>
+      </div>
+      <div id="info-content"></div>
+    </div>
+  </div>
+
+  <script>
+    // Load info content
+    fetch('intro_content.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('info-content').innerHTML = html;
+      });
+    
+    // Initialize controls
+    initControls();
+  </script>
 
 </body>
 </html>

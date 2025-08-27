@@ -14,8 +14,8 @@ const ruleIndexColors = {
   7: [255,255,0]
 };
 
-// Canvas interaction state for fullscreen canvas
-let fsCanvasState = {
+// Canvas interaction state
+let canvasState = {
   scale: 1,
   offsetX: 0,
   offsetY: 0,
@@ -25,23 +25,10 @@ let fsCanvasState = {
   isInitialized: false
 };
 
-// Current data storage
-let currentHistory = null;
-let currentMode = 'Binary';
-
 function drawCA(history, mode) {
-  // Store current data for fullscreen use
-  currentHistory = history;
-  currentMode = mode;
-  
-  // Draw on normal canvas
-  drawOnCanvas('ca-canvas', history, mode, false);
-}
-
-function drawOnCanvas(canvasId, history, mode, isFullscreen = false) {
   let steps = history.length;
   let width = history[0].length;
-  const canvas = document.getElementById(canvasId);
+  const canvas = document.getElementById('ca-canvas');
   
   if (!canvas) return;
   
@@ -77,49 +64,42 @@ function drawOnCanvas(canvasId, history, mode, isFullscreen = false) {
 
   ctx.putImageData(imageData, 0, 0);
 
-  if (isFullscreen) {
-    // For fullscreen, make it fit nicely but maintain aspect ratio
-    const containerWidth = window.innerWidth - 40;
-    const containerHeight = window.innerHeight - 120; // Account for menubar
-    
-    const scaleX = containerWidth / width;
-    const scaleY = containerHeight / steps;
-    const baseScale = Math.min(scaleX, scaleY, 8); // Cap at 8x for very small patterns
-    
-    canvas.style.width = (width * baseScale) + "px";
-    canvas.style.height = (steps * baseScale) + "px";
-    
-    // Initialize fullscreen interactions if not already done
-    if (!fsCanvasState.isInitialized) {
-      initFullscreenCanvasInteractions();
-      fsCanvasState.isInitialized = true;
-    }
-    
-    // Reset transform state when new data is drawn
-    resetFullscreenCanvasTransform();
-  } else {
-    // Normal canvas scaling
-    const scaleFactor = 4;
-    canvas.style.width = (width * scaleFactor) + "px";
-    canvas.style.height = (steps * scaleFactor) + "px";
+  // Smart canvas sizing - fit nicely but maintain aspect ratio
+  const containerWidth = window.innerWidth - 40;
+  const containerHeight = window.innerHeight - 120; // Account for menubar
+  
+  const scaleX = containerWidth / width;
+  const scaleY = containerHeight / steps;
+  const baseScale = Math.min(scaleX, scaleY, 8); // Cap at 8x for very small patterns
+  
+  canvas.style.width = (width * baseScale) + "px";
+  canvas.style.height = (steps * baseScale) + "px";
+  
+  // Initialize canvas interactions if not already done
+  if (!canvasState.isInitialized) {
+    initCanvasInteractions();
+    canvasState.isInitialized = true;
   }
+  
+  // Reset transform state when new data is drawn
+  resetCanvasTransform();
 }
 
-function initFullscreenCanvasInteractions() {
-  const canvas = document.getElementById('fs-ca-canvas');
+function initCanvasInteractions() {
+  const canvas = document.getElementById('ca-canvas');
   if (!canvas) return;
   
   // Mouse wheel zoom
-  canvas.addEventListener('wheel', handleFullscreenMouseWheel, { passive: false });
+  canvas.addEventListener('wheel', handleMouseWheel, { passive: false });
   
   // Mouse drag pan
-  canvas.addEventListener('mousedown', handleFullscreenMouseDown);
-  canvas.addEventListener('mousemove', handleFullscreenMouseMove);
-  canvas.addEventListener('mouseup', handleFullscreenMouseUp);
-  canvas.addEventListener('mouseleave', handleFullscreenMouseUp);
+  canvas.addEventListener('mousedown', handleMouseDown);
+  canvas.addEventListener('mousemove', handleMouseMove);
+  canvas.addEventListener('mouseup', handleMouseUp);
+  canvas.addEventListener('mouseleave', handleMouseUp);
   
   // Keyboard shortcuts
-  document.addEventListener('keydown', handleFullscreenKeyDown);
+  document.addEventListener('keydown', handleKeyDown);
   
   // Prevent context menu on right click
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -129,206 +109,144 @@ function initFullscreenCanvasInteractions() {
   canvas.style.cursor = 'grab';
 }
 
-function handleFullscreenMouseWheel(e) {
+function handleMouseWheel(e) {
   e.preventDefault();
   
-  const canvas = document.getElementById('fs-ca-canvas');
+  const canvas = document.getElementById('ca-canvas');
   const rect = canvas.getBoundingClientRect();
   const mouseX = e.clientX - rect.left;
   const mouseY = e.clientY - rect.top;
   
   const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-  const newScale = Math.max(0.1, Math.min(10, fsCanvasState.scale * zoomFactor));
+  const newScale = Math.max(0.1, Math.min(10, canvasState.scale * zoomFactor));
   
-  if (newScale !== fsCanvasState.scale) {
+  if (newScale !== canvasState.scale) {
     // Zoom towards mouse position
-    fsCanvasState.offsetX = mouseX - (mouseX - fsCanvasState.offsetX) * (newScale / fsCanvasState.scale);
-    fsCanvasState.offsetY = mouseY - (mouseY - fsCanvasState.offsetY) * (newScale / fsCanvasState.scale);
-    fsCanvasState.scale = newScale;
+    canvasState.offsetX = mouseX - (mouseX - canvasState.offsetX) * (newScale / canvasState.scale);
+    canvasState.offsetY = mouseY - (mouseY - canvasState.offsetY) * (newScale / canvasState.scale);
+    canvasState.scale = newScale;
     
-    applyFullscreenCanvasTransform();
+    applyCanvasTransform();
   }
 }
 
-function handleFullscreenMouseDown(e) {
+function handleMouseDown(e) {
   if (e.button === 0) { // Left mouse button
-    fsCanvasState.isDragging = true;
-    fsCanvasState.lastMouseX = e.clientX;
-    fsCanvasState.lastMouseY = e.clientY;
+    canvasState.isDragging = true;
+    canvasState.lastMouseX = e.clientX;
+    canvasState.lastMouseY = e.clientY;
     
-    const canvas = document.getElementById('fs-ca-canvas');
+    const canvas = document.getElementById('ca-canvas');
     canvas.style.cursor = 'grabbing';
     
     // Add dragging class to container for CSS styling
-    const container = document.getElementById('fs-canvas-container');
+    const container = document.getElementById('canvas-container');
     if (container) {
       container.classList.add('canvas-dragging');
     }
   }
 }
 
-function handleFullscreenMouseMove(e) {
-  if (fsCanvasState.isDragging) {
-    const deltaX = e.clientX - fsCanvasState.lastMouseX;
-    const deltaY = e.clientY - fsCanvasState.lastMouseY;
+function handleMouseMove(e) {
+  if (canvasState.isDragging) {
+    const deltaX = e.clientX - canvasState.lastMouseX;
+    const deltaY = e.clientY - canvasState.lastMouseY;
     
-    fsCanvasState.offsetX += deltaX;
-    fsCanvasState.offsetY += deltaY;
-    fsCanvasState.lastMouseX = e.clientX;
-    fsCanvasState.lastMouseY = e.clientY;
+    canvasState.offsetX += deltaX;
+    canvasState.offsetY += deltaY;
+    canvasState.lastMouseX = e.clientX;
+    canvasState.lastMouseY = e.clientY;
     
-    applyFullscreenCanvasTransform();
+    applyCanvasTransform();
   }
 }
 
-function handleFullscreenMouseUp(e) {
-  fsCanvasState.isDragging = false;
+function handleMouseUp(e) {
+  canvasState.isDragging = false;
   
-  const canvas = document.getElementById('fs-ca-canvas');
+  const canvas = document.getElementById('ca-canvas');
   canvas.style.cursor = 'grab';
   
   // Remove dragging class from container
-  const container = document.getElementById('fs-canvas-container');
+  const container = document.getElementById('canvas-container');
   if (container) {
     container.classList.remove('canvas-dragging');
   }
 }
 
-function handleFullscreenKeyDown(e) {
-  // Only handle keys when in fullscreen mode
-  const fullscreenView = document.getElementById('fullscreen-view');
-  if (!fullscreenView || fullscreenView.style.display === 'none') {
-    return;
-  }
-  
+function handleKeyDown(e) {
   switch(e.key) {
-    case 'Escape':
+    case 'i':
+    case 'I':
       e.preventDefault();
-      exitFullscreenMode();
+      toggleInfoModal();
       break;
     case 'r':
     case 'R':
       e.preventDefault();
-      resetFullscreenCanvasTransform();
+      resetCanvasTransform();
       break;
     case '+':
     case '=':
       e.preventDefault();
-      zoomFullscreenCanvas(1.2);
+      zoomCanvas(1.2);
       break;
     case '-':
     case '_':
       e.preventDefault();
-      zoomFullscreenCanvas(0.8);
+      zoomCanvas(0.8);
       break;
     case '0':
       e.preventDefault();
-      resetFullscreenCanvasTransform();
+      resetCanvasTransform();
+      break;
+    case 'Escape':
+      e.preventDefault();
+      closeInfoModal();
       break;
   }
 }
 
-function zoomFullscreenCanvas(factor) {
-  const canvas = document.getElementById('fs-ca-canvas');
+function zoomCanvas(factor) {
+  const canvas = document.getElementById('ca-canvas');
   const rect = canvas.getBoundingClientRect();
   const centerX = rect.width / 2;
   const centerY = rect.height / 2;
   
-  const newScale = Math.max(0.1, Math.min(10, fsCanvasState.scale * factor));
+  const newScale = Math.max(0.1, Math.min(10, canvasState.scale * factor));
   
-  if (newScale !== fsCanvasState.scale) {
-    fsCanvasState.offsetX = centerX - (centerX - fsCanvasState.offsetX) * (newScale / fsCanvasState.scale);
-    fsCanvasState.offsetY = centerY - (centerY - fsCanvasState.offsetY) * (newScale / fsCanvasState.scale);
-    fsCanvasState.scale = newScale;
+  if (newScale !== canvasState.scale) {
+    canvasState.offsetX = centerX - (centerX - canvasState.offsetX) * (newScale / canvasState.scale);
+    canvasState.offsetY = centerY - (centerY - canvasState.offsetY) * (newScale / canvasState.scale);
+    canvasState.scale = newScale;
     
-    applyFullscreenCanvasTransform();
+    applyCanvasTransform();
   }
 }
 
-function applyFullscreenCanvasTransform() {
-  const canvas = document.getElementById('fs-ca-canvas');
-  canvas.style.transform = `translate(${fsCanvasState.offsetX}px, ${fsCanvasState.offsetY}px) scale(${fsCanvasState.scale})`;
+function applyCanvasTransform() {
+  const canvas = document.getElementById('ca-canvas');
+  canvas.style.transform = `translate(${canvasState.offsetX}px, ${canvasState.offsetY}px) scale(${canvasState.scale})`;
   canvas.style.transformOrigin = '0 0';
 }
 
-function resetFullscreenCanvasTransform() {
-  fsCanvasState.scale = 1;
-  fsCanvasState.offsetX = 0;
-  fsCanvasState.offsetY = 0;
-  applyFullscreenCanvasTransform();
+function resetCanvasTransform() {
+  canvasState.scale = 1;
+  canvasState.offsetX = 0;
+  canvasState.offsetY = 0;
+  applyCanvasTransform();
 }
 
-function enterFullscreenMode() {
-  // Copy current control values to fullscreen controls
-  copyControlsToFullscreen();
-  
-  // Show fullscreen view
-  document.getElementById('normal-view').style.display = 'none';
-  document.getElementById('fullscreen-view').style.display = 'flex';
-  
-  // If we have current data, draw it on the fullscreen canvas
-  if (currentHistory) {
-    drawOnCanvas('fs-ca-canvas', currentHistory, currentMode, true);
-  }
-  
-  // Focus the canvas for keyboard controls
-  setTimeout(() => {
-    const canvas = document.getElementById('fs-ca-canvas');
-    if (canvas) canvas.focus();
-  }, 100);
-}
-
-function exitFullscreenMode() {
-  document.getElementById('fullscreen-view').style.display = 'none';
-  document.getElementById('normal-view').style.display = 'block';
-}
-
-function copyControlsToFullscreen() {
-  // Copy values from normal controls to fullscreen controls
-  const normalRule = document.getElementById('rule-input');
-  const normalInitial = document.getElementById('initial-input');
-  const normalMode = document.querySelector('input[name="mode"]:checked');
-  const normalSteps = document.getElementById('steps-slider');
-  const normalToroidal = document.getElementById('toroidal-checkbox');
-  
-  if (normalRule) document.getElementById('fs-rule-input').value = normalRule.value;
-  if (normalInitial) document.getElementById('fs-initial-input').value = normalInitial.value;
-  if (normalMode) {
-    const fsMode = document.querySelector(`input[name="fs-mode"][value="${normalMode.value}"]`);
-    if (fsMode) fsMode.checked = true;
-  }
-  if (normalSteps) {
-    document.getElementById('fs-steps-slider').value = normalSteps.value;
-    document.getElementById('fs-steps-value').textContent = normalSteps.value;
-  }
-  if (normalToroidal) document.getElementById('fs-toroidal-checkbox').checked = normalToroidal.checked;
-}
-
-function runFullscreenECA() {
-  let ruleVal = document.getElementById('fs-rule-input').value.trim();
-  let rule = parseInt(ruleVal, 10);
-  if (isNaN(rule) || rule < 0 || rule > 255) {
-    rule = 30; // default if invalid
-  }
-
-  const initPattern = document.getElementById('fs-initial-input').value.trim();
-  const mode = document.querySelector('input[name="fs-mode"]:checked').value;
-  const toroidal = document.getElementById('fs-toroidal-checkbox').checked; 
-  const steps = parseInt(document.getElementById('fs-steps-slider').value, 10);
-
-  const rule_map = generateAscendingRuleMap(rule);
-  const width = 101;
-  const initial_state = createInitialState(width, initPattern);
-
-  let history;
-  if (mode === 'Binary') {
-    history = evolveCABinary(initial_state, rule_map, steps, toroidal);
+function toggleInfoModal() {
+  const modal = document.getElementById('info-modal');
+  if (modal.style.display === 'none') {
+    modal.style.display = 'flex';
   } else {
-    history = evolveCAAscending(initial_state, rule_map, steps, toroidal);
+    modal.style.display = 'none';
   }
-  
-  currentHistory = history;
-  currentMode = mode;
-  
-  drawOnCanvas('fs-ca-canvas', history, mode, true);
+}
+
+function closeInfoModal() {
+  const modal = document.getElementById('info-modal');
+  modal.style.display = 'none';
 }
