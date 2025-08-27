@@ -14,6 +14,9 @@ const ruleIndexColors = {
   7: [255,255,0]
 };
 
+// Simple zoom state
+let zoomLevel = 1;
+
 function drawCA(history, mode) {
     let steps = history.length;
     let width = history[0].length;
@@ -50,14 +53,39 @@ function drawCA(history, mode) {
   
     ctx.putImageData(imageData, 0, 0);
   
-    // Fill the available screen space while maintaining aspect ratio
-    const containerWidth = window.innerWidth;
-    const containerHeight = window.innerHeight - 60; // Account for menubar
+    // Set up mouse wheel zoom if not already done
+    if (!canvas.hasZoomListener) {
+      canvas.addEventListener('wheel', handleZoom, { passive: false });
+      canvas.hasZoomListener = true;
+    }
     
-    const scaleX = containerWidth / width;
-    const scaleY = containerHeight / steps;
-    const scale = Math.min(scaleX, scaleY);
-    
-    canvas.style.width = (width * scale) + "px";
-    canvas.style.height = (steps * scale) + "px";
-  }
+    // Apply current zoom and center the canvas
+    applyZoom();
+}
+
+function handleZoom(e) {
+  e.preventDefault();
+  
+  const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+  zoomLevel = Math.max(0.1, Math.min(10, zoomLevel * zoomFactor));
+  
+  applyZoom();
+}
+
+function applyZoom() {
+  const canvas = document.getElementById('ca-canvas');
+  if (!canvas) return;
+  
+  // Fill the available screen space while maintaining aspect ratio, then apply zoom
+  const containerWidth = window.innerWidth;
+  const containerHeight = window.innerHeight - 60; // Account for menubar
+  
+  const scaleX = containerWidth / canvas.width;
+  const scaleY = containerHeight / canvas.height;
+  const baseScale = Math.min(scaleX, scaleY);
+  
+  const finalScale = baseScale * zoomLevel;
+  
+  canvas.style.width = (canvas.width * finalScale) + "px";
+  canvas.style.height = (canvas.height * finalScale) + "px";
+}

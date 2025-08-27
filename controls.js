@@ -4,6 +4,11 @@ function initControls() {
     document.getElementById('steps-value').textContent = e.target.value;
   });
 
+  // Width slider
+  document.getElementById('width-slider').addEventListener('input', (e) => {
+    document.getElementById('width-value').textContent = e.target.value;
+  });
+
   // Run button
   document.getElementById('run-button').addEventListener('click', runECA);
 }
@@ -21,7 +26,7 @@ function runECA() {
   const steps = parseInt(document.getElementById('steps-slider').value, 10);
 
   const rule_map = generateAscendingRuleMap(rule);
-  const width = 101;
+  const width = parseInt(document.getElementById('width-slider').value, 10);
   const initial_state = createInitialState(width, initPattern);
 
   let history;
