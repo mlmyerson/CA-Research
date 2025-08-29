@@ -1,4 +1,20 @@
 import { useState, useEffect } from 'react';
+import { ThemeProvider } from '@mui/material/styles';
+import { CssBaseline } from '@mui/material';
+import {
+  Container,
+  Typography,
+  Box,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Grid,
+  Paper,
+  Chip
+} from '@mui/material';
+import { theme } from './theme';
 import CellularAutomatonGrid from './components/CellularAutomatonGrid';
 import './components/CellularAutomatonGrid.css';
 
@@ -67,103 +83,140 @@ function App() {
   }, [latticeWidth, lightconeLength, rule, mode]);
 
   return (
-    <div className="App" style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
-        Elementary Cellular Automaton
-      </h1>
-      
-      {/* Temporary controls - will be replaced by slide-out menu */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        gap: '20px', 
-        marginBottom: '30px',
-        flexWrap: 'wrap'
-      }}>
-        <div>
-          <label htmlFor="latticeWidth">Lattice Width: </label>
-          <input
-            id="latticeWidth"
-            type="number"
-            value={latticeWidth}
-            onChange={(e) => setLatticeWidth(parseInt(e.target.value))}
-            min="10"
-            max="200"
-            style={{ width: '80px' }}
-          />
-        </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Container maxWidth="xl" sx={{ py: 3, bgcolor: 'background.default', minHeight: '100vh' }}>
+        <Typography variant="h3" component="h1" align="center" gutterBottom sx={{ color: 'text.primary', mb: 4 }}>
+          Elementary Cellular Automaton
+        </Typography>
         
-        <div>
-          <label htmlFor="lightconeLength">Generations: </label>
-          <input
-            id="lightconeLength"
-            type="number"
-            value={lightconeLength}
-            onChange={(e) => setLightconeLength(parseInt(e.target.value))}
-            min="10"
-            max="100"
-            style={{ width: '80px' }}
-          />
-        </div>
-        
-        <div>
-          <label htmlFor="cellSize">Cell Size: </label>
-          <input
-            id="cellSize"
-            type="number"
-            value={cellSize}
-            onChange={(e) => setCellSize(parseInt(e.target.value))}
-            min="2"
-            max="20"
-            style={{ width: '80px' }}
-          />
-        </div>
-        
-        <div>
-          <label htmlFor="rule">Rule: </label>
-          <input
-            id="rule"
-            type="number"
-            value={rule}
-            onChange={(e) => setRule(parseInt(e.target.value))}
-            min="0"
-            max="255"
-            style={{ width: '80px' }}
-          />
-        </div>
-        
-        <div>
-          <label htmlFor="mode">Mode: </label>
-          <select
-            id="mode"
-            value={mode}
-            onChange={(e) => setMode(e.target.value as 'binary' | 'state')}
-            style={{ width: '80px' }}
-          >
-            <option value="binary">Binary</option>
-            <option value="state">State</option>
-          </select>
-        </div>
-      </div>
+        {/* Controls Section */}
+        <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Parameters
+          </Typography>
+          <Grid container spacing={3} alignItems="center">
+            <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
+              <TextField
+                label="Lattice Width"
+                type="number"
+                value={latticeWidth}
+                onChange={(e) => setLatticeWidth(parseInt(e.target.value))}
+                inputProps={{ min: 10, max: 200 }}
+                fullWidth
+                size="small"
+              />
+            </Grid>
+            
+            <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
+              <TextField
+                label="Generations"
+                type="number"
+                value={lightconeLength}
+                onChange={(e) => setLightconeLength(parseInt(e.target.value))}
+                inputProps={{ min: 10, max: 100 }}
+                fullWidth
+                size="small"
+              />
+            </Grid>
+            
+            <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
+              <TextField
+                label="Cell Size"
+                type="number"
+                value={cellSize}
+                onChange={(e) => setCellSize(parseInt(e.target.value))}
+                inputProps={{ min: 2, max: 20 }}
+                fullWidth
+                size="small"
+              />
+            </Grid>
+            
+            <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
+              <TextField
+                label="Rule"
+                type="number"
+                value={rule}
+                onChange={(e) => setRule(parseInt(e.target.value))}
+                inputProps={{ min: 0, max: 255 }}
+                fullWidth
+                size="small"
+              />
+            </Grid>
+            
+            <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Mode</InputLabel>
+                <Select
+                  value={mode}
+                  label="Mode"
+                  onChange={(e) => setMode(e.target.value as 'binary' | 'state')}
+                >
+                  <MenuItem value="binary">Binary</MenuItem>
+                  <MenuItem value="state">State</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </Paper>
 
-      <CellularAutomatonGrid
-        latticeWidth={latticeWidth}
-        lightconeLength={lightconeLength}
-        cellSize={cellSize}
-        data={data}
-        mode={mode}
-        className="main-grid"
-      />
-      
-      <div style={{ textAlign: 'center', marginTop: '20px', color: '#666' }}>
-        <p>Rule {rule} - {latticeWidth} cells × {lightconeLength} generations ({mode} mode)</p>
-        {mode === 'state' && (
-          <p style={{ fontSize: '12px', marginTop: '10px' }}>
-            State colors: 0-White, 1-Red, 2-Green, 3-Blue, 4-Yellow, 5-Magenta, 6-Cyan, 7-Black
-          </p>
-        )}
-      </div>
-    </div>
+        {/* Grid Section */}
+        <Box display="flex" justifyContent="center" mb={3}>
+          <CellularAutomatonGrid
+            latticeWidth={latticeWidth}
+            lightconeLength={lightconeLength}
+            cellSize={cellSize}
+            data={data}
+            mode={mode}
+            className="main-grid"
+          />
+        </Box>
+        
+        {/* Status Section */}
+        <Paper elevation={1} sx={{ p: 2, textAlign: 'center' }}>
+          <Typography variant="body1" color="text.secondary">
+            Rule {rule} - {latticeWidth} cells × {lightconeLength} generations
+          </Typography>
+          <Box display="flex" justifyContent="center" alignItems="center" gap={1} mt={1}>
+            <Chip 
+              label={`${mode} mode`} 
+              color={mode === 'binary' ? 'primary' : 'secondary'} 
+              size="small" 
+            />
+          </Box>
+          {mode === 'state' && (
+            <Box mt={2}>
+              <Typography variant="caption" display="block" gutterBottom>
+                State Colors:
+              </Typography>
+              <Box display="flex" justifyContent="center" flexWrap="wrap" gap={1}>
+                {[
+                  { state: 0, color: '#fff', label: 'White' },
+                  { state: 1, color: '#ff0000', label: 'Red' },
+                  { state: 2, color: '#00ff00', label: 'Green' },
+                  { state: 3, color: '#0000ff', label: 'Blue' },
+                  { state: 4, color: '#ffff00', label: 'Yellow' },
+                  { state: 5, color: '#ff00ff', label: 'Magenta' },
+                  { state: 6, color: '#00ffff', label: 'Cyan' },
+                  { state: 7, color: '#000000', label: 'Black' },
+                ].map(({ state, color, label }) => (
+                  <Chip
+                    key={state}
+                    label={`${state}: ${label}`}
+                    size="small"
+                    sx={{
+                      bgcolor: color,
+                      color: color === '#fff' || color === '#ffff00' || color === '#00ffff' ? '#000' : '#fff',
+                      border: color === '#fff' ? '1px solid #ccc' : 'none'
+                    }}
+                  />
+                ))}
+              </Box>
+            </Box>
+          )}
+        </Paper>
+      </Container>
+    </ThemeProvider>
   );
 }
 

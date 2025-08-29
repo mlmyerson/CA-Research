@@ -1,3 +1,5 @@
+import { Box, Paper } from '@mui/material';
+
 interface CellularAutomatonGridProps {
   /** Width of the lattice (number of cells horizontally) */
   latticeWidth: number;
@@ -55,39 +57,48 @@ const CellularAutomatonGrid = ({
   };
 
   return (
-    <div 
+    <Paper 
+      elevation={4}
       className={`cellular-automaton-grid ${className}`}
-      style={{
+      sx={{
         width: gridWidth,
         height: gridHeight,
         display: 'grid',
         gridTemplateColumns: `repeat(${latticeWidth}, ${cellSize}px)`,
         gridTemplateRows: `repeat(${lightconeLength}, ${cellSize}px)`,
         gap: 0,
-        border: '1px solid #ccc',
-        margin: '20px auto'
+        borderRadius: 2,
+        overflow: 'hidden',
+        border: '1px solid #e0e0e0'
       }}
     >
       {Array.from({ length: lightconeLength }, (_, generation) =>
         Array.from({ length: latticeWidth }, (_, position) => {
           const cellValue = data[generation]?.[position] || 0;
           return (
-            <div
+            <Box
               key={`cell-${generation}-${position}`}
               className={`cell ${getCellClass(cellValue)}`}
-              style={{
+              sx={{
                 width: cellSize,
                 height: cellSize,
                 backgroundColor: getCellColor(cellValue),
-                border: '0.5px solid #eee',
-                transition: 'background-color 0.2s ease'
+                border: '0.5px solid #f0f0f0',
+                transition: 'all 0.2s ease',
+                cursor: 'pointer',
+                '&:hover': {
+                  opacity: 0.8,
+                  transform: 'scale(1.05)',
+                  zIndex: 1,
+                  boxShadow: '0 0 4px rgba(0,0,0,0.3)'
+                }
               }}
               title={mode === 'state' ? `Rule: ${cellValue}` : `Value: ${cellValue}`}
             />
           );
         })
       )}
-    </div>
+    </Paper>
   );
 };
 

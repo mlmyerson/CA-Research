@@ -1,15 +1,6 @@
-/* Cellular Automaton Grid Styles */
-.cellular-automaton-grid {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  overflow: hidden;
-}
+/* Cellular Automaton Grid Styles - Supplementary to Material UI */
 
-.cellular-automaton-grid .cell {
-  box-sizing: border-box;
-}
-
-/* Binary mode styles */
+/* Legacy binary mode styles - now handled by MUI inline styles */
 .cellular-automaton-grid .cell.alive {
   background-color: #000;
 }
@@ -18,7 +9,7 @@
   background-color: #fff;
 }
 
-/* State mode styles (0-7) */
+/* Legacy state mode styles - now handled by MUI inline styles */
 .cellular-automaton-grid .cell.state-0 {
   background-color: #fff;
 }
@@ -51,15 +42,9 @@
   background-color: #000000;
 }
 
-.cellular-automaton-grid .cell:hover {
-  opacity: 0.8;
-  cursor: pointer;
-}
-
-/* Responsive adjustments */
+/* Additional responsive adjustments for mobile */
 @media (max-width: 768px) {
   .cellular-automaton-grid {
-    margin: 10px auto;
     max-width: 100%;
     overflow-x: auto;
   }
