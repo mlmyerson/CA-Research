@@ -230,7 +230,7 @@ const CellularAutomatonGrid = ({
         ref={containerRef}
         sx={{
           width: '100%',
-          height: '70vh',
+          height: 'calc(100vh - 64px)', // Subtract app bar height
           position: 'relative',
           cursor: isDragging ? 'grabbing' : 'grab',
           userSelect: 'none'

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import {
-  Container,
   Typography,
   Box,
   TextField,
@@ -12,7 +11,6 @@ import {
   InputLabel,
   Grid,
   Paper,
-  Chip,
   Drawer,
   IconButton,
   AppBar,
@@ -101,6 +99,28 @@ function App() {
     const newData = generateCellularAutomaton(latticeWidth, lightconeLength, rule, mode);
     setData(newData);
   }, [latticeWidth, lightconeLength, rule, mode]);
+
+  // Calculate optimal initial zoom to fit the image to the viewport
+  useEffect(() => {
+    const baseCellSize = 4;
+    const imageWidth = latticeWidth * baseCellSize;
+    const imageHeight = lightconeLength * baseCellSize;
+    
+    // Get viewport dimensions (subtract app bar height)
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight - 64; // 64px for app bar
+    
+    // Calculate zoom to fit both dimensions
+    const zoomToFitWidth = viewportWidth / imageWidth;
+    const zoomToFitHeight = viewportHeight / imageHeight;
+    
+    // Use the smaller zoom to ensure the entire image fits
+    const optimalZoom = Math.min(zoomToFitWidth, zoomToFitHeight);
+    
+    setZoom(Math.max(0.1, optimalZoom)); // Minimum zoom of 0.1
+    setPanX(0);
+    setPanY(0);
+  }, [latticeWidth, lightconeLength]);
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -226,82 +246,20 @@ function App() {
         </Drawer>
 
         {/* Main Content */}
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-          <Toolbar />
-          <Container maxWidth="xl" sx={{ py: 3 }}>
-            {/* Grid Section */}
-            <Box display="flex" justifyContent="center" mb={3}>
-              <CellularAutomatonGrid
-                latticeWidth={latticeWidth}
-                lightconeLength={lightconeLength}
-                zoom={zoom}
-                panX={panX}
-                panY={panY}
-                onZoom={setZoom}
-                onPan={(x, y) => { setPanX(x); setPanY(y); }}
-                data={data}
-                mode={mode}
-                className="main-grid"
-              />
-            </Box>
-            
-            {/* Instructions */}
-            <Paper elevation={0} sx={{ p: 2, mb: 2, bgcolor: 'grey.50' }}>
-              <Typography variant="caption" display="block" align="center" color="text.secondary">
-                💡 <strong>Mouse wheel</strong> to zoom • <strong>Click and drag</strong> to pan when zoomed
-              </Typography>
-            </Paper>
-            
-            {/* Status Section */}
-            <Paper elevation={1} sx={{ p: 2, textAlign: 'center' }}>
-              <Typography variant="body1" color="text.secondary">
-                Rule {rule} - {latticeWidth} cells × {lightconeLength} generations
-              </Typography>
-              <Box display="flex" justifyContent="center" alignItems="center" gap={1} mt={1}>
-                <Chip 
-                  label={`${mode} mode`} 
-                  color={mode === 'binary' ? 'primary' : 'secondary'} 
-                  size="small" 
-                />
-                <Chip 
-                  label={`${Math.round(zoom * 100)}% zoom`} 
-                  variant="outlined"
-                  size="small" 
-                  color={zoom > 2 ? 'warning' : zoom < 0.5 ? 'info' : 'default'}
-                />
-              </Box>
-              {mode === 'state' && (
-                <Box mt={2}>
-                  <Typography variant="caption" display="block" gutterBottom>
-                    State Colors:
-                  </Typography>
-                  <Box display="flex" justifyContent="center" flexWrap="wrap" gap={1}>
-                    {[
-                      { state: 0, color: '#fff', label: 'White' },
-                      { state: 1, color: '#ff0000', label: 'Red' },
-                      { state: 2, color: '#00ff00', label: 'Green' },
-                      { state: 3, color: '#0000ff', label: 'Blue' },
-                      { state: 4, color: '#ffff00', label: 'Yellow' },
-                      { state: 5, color: '#ff00ff', label: 'Magenta' },
-                      { state: 6, color: '#00ffff', label: 'Cyan' },
-                      { state: 7, color: '#000000', label: 'Black' },
-                    ].map(({ state, color, label }) => (
-                      <Chip
-                        key={state}
-                        label={`${state}: ${label}`}
-                        size="small"
-                        sx={{
-                          bgcolor: color,
-                          color: color === '#fff' || color === '#ffff00' || color === '#00ffff' ? '#000' : '#fff',
-                          border: color === '#fff' ? '1px solid #ccc' : 'none'
-                        }}
-                      />
-                    ))}
-                  </Box>
-                </Box>
-              )}
-            </Paper>
-          </Container>
+        <Box component="main" sx={{ flexGrow: 1, position: 'relative' }}>
+          {/* Grid Section - Full Width and Height */}
+          <CellularAutomatonGrid
+            latticeWidth={latticeWidth}
+            lightconeLength={lightconeLength}
+            zoom={zoom}
+            panX={panX}
+            panY={panY}
+            onZoom={setZoom}
+            onPan={(x, y) => { setPanX(x); setPanY(y); }}
+            data={data}
+            mode={mode}
+            className="main-grid"
+          />
         </Box>
       </Box>
     </ThemeProvider>
