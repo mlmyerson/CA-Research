@@ -16,11 +16,17 @@ import {
   Drawer,
   IconButton,
   AppBar,
-  Toolbar
+  Toolbar,
+  Collapse,
+  List,
+  ListItemButton,
+  ListItemText
 } from '@mui/material';
 import {
   Menu as MenuIcon,
-  Close as CloseIcon
+  Close as CloseIcon,
+  ExpandLess,
+  ExpandMore
 } from '@mui/icons-material';
 import { theme } from './theme';
 import CellularAutomatonGrid from './components/CellularAutomatonGrid';
@@ -84,6 +90,7 @@ function App() {
   const [mode, setMode] = useState<'binary' | 'state'>('binary');
   const [data, setData] = useState<number[][]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [parametersExpanded, setParametersExpanded] = useState(true);
 
   // Generate data when parameters change
   useEffect(() => {
@@ -93,6 +100,10 @@ function App() {
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
+  };
+
+  const toggleParameters = () => {
+    setParametersExpanded(!parametersExpanded);
   };
 
   return (
@@ -133,79 +144,92 @@ function App() {
           }}
         >
           <Toolbar />
-          <Box sx={{ overflow: 'auto', p: 2 }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-              <Typography variant="h6">Parameters</Typography>
+          <Box sx={{ overflow: 'auto' }}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" p={2} pb={0}>
+              <Typography variant="h6">Controls</Typography>
               <IconButton onClick={toggleDrawer}>
                 <CloseIcon />
               </IconButton>
             </Box>
             
-            <Paper elevation={2} sx={{ p: 3 }}>
-              <Grid container spacing={3}>
-                <Grid size={{ xs: 12 }}>
-                  <TextField
-                    label="Lattice Width"
-                    type="number"
-                    value={latticeWidth}
-                    onChange={(e) => setLatticeWidth(parseInt(e.target.value))}
-                    inputProps={{ min: 10, max: 200 }}
-                    fullWidth
-                    size="small"
-                  />
-                </Grid>
-                
-                <Grid size={{ xs: 12 }}>
-                  <TextField
-                    label="Generations"
-                    type="number"
-                    value={lightconeLength}
-                    onChange={(e) => setLightconeLength(parseInt(e.target.value))}
-                    inputProps={{ min: 10, max: 100 }}
-                    fullWidth
-                    size="small"
-                  />
-                </Grid>
-                
-                <Grid size={{ xs: 12 }}>
-                  <TextField
-                    label="Cell Size"
-                    type="number"
-                    value={cellSize}
-                    onChange={(e) => setCellSize(parseInt(e.target.value))}
-                    inputProps={{ min: 2, max: 20 }}
-                    fullWidth
-                    size="small"
-                  />
-                </Grid>
-                
-                <Grid size={{ xs: 12 }}>
-                  <TextField
-                    label="Rule"
-                    type="number"
-                    value={rule}
-                    onChange={(e) => setRule(parseInt(e.target.value))}
-                    inputProps={{ min: 0, max: 255 }}
-                    fullWidth
-                    size="small"
-                  />
-                </Grid>
-                
-                <Grid size={{ xs: 12 }}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Mode</InputLabel>
-                    <Select
-                      value={mode}
-                      label="Mode"
-                      onChange={(e) => setMode(e.target.value as 'binary' | 'state')}
-                    >
-                      <MenuItem value="binary">Binary</MenuItem>
-                      <MenuItem value="state">State</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </Paper>
+            <List>
+              <ListItemButton onClick={toggleParameters}>
+                <ListItemText 
+                  primary="Parameters" 
+                  secondary={!parametersExpanded ? `Rule ${rule} • ${latticeWidth}×${lightconeLength} • ${cellSize}px • ${mode}` : undefined}
+                />
+                {parametersExpanded ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+              <Collapse in={parametersExpanded} timeout="auto" unmountOnExit>
+                <Box sx={{ px: 2, pb: 2 }}>
+                  <Paper elevation={2} sx={{ p: 3 }}>
+                    <Grid container spacing={3}>
+                      <Grid size={{ xs: 12 }}>
+                        <TextField
+                          label="Lattice Width"
+                          type="number"
+                          value={latticeWidth}
+                          onChange={(e) => setLatticeWidth(parseInt(e.target.value))}
+                          inputProps={{ min: 10, max: 200 }}
+                          fullWidth
+                          size="small"
+                        />
+                      </Grid>
+                      
+                      <Grid size={{ xs: 12 }}>
+                        <TextField
+                          label="Generations"
+                          type="number"
+                          value={lightconeLength}
+                          onChange={(e) => setLightconeLength(parseInt(e.target.value))}
+                          inputProps={{ min: 10, max: 100 }}
+                          fullWidth
+                          size="small"
+                        />
+                      </Grid>
+                      
+                      <Grid size={{ xs: 12 }}>
+                        <TextField
+                          label="Cell Size"
+                          type="number"
+                          value={cellSize}
+                          onChange={(e) => setCellSize(parseInt(e.target.value))}
+                          inputProps={{ min: 2, max: 20 }}
+                          fullWidth
+                          size="small"
+                        />
+                      </Grid>
+                      
+                      <Grid size={{ xs: 12 }}>
+                        <TextField
+                          label="Rule"
+                          type="number"
+                          value={rule}
+                          onChange={(e) => setRule(parseInt(e.target.value))}
+                          inputProps={{ min: 0, max: 255 }}
+                          fullWidth
+                          size="small"
+                        />
+                      </Grid>
+                      
+                      <Grid size={{ xs: 12 }}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>Mode</InputLabel>
+                          <Select
+                            value={mode}
+                            label="Mode"
+                            onChange={(e) => setMode(e.target.value as 'binary' | 'state')}
+                          >
+                            <MenuItem value="binary">Binary</MenuItem>
+                            <MenuItem value="state">State</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                    </Grid>
+                  </Paper>
+                </Box>
+              </Collapse>
+            </List>
           </Box>
         </Drawer>
 
