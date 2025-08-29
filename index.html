@@ -1,65 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<link rel="stylesheet" href="styles.css">
-<meta charset="UTF-8">
-<meta name="description" content="Elementary Cellular Automata Visualization">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elementary Cellular Automata</title>
-</head>
-
-<body>
-  <script>
-  // Ascending indexing convention neighborhoods
-  const ASCENDING_NEIGHBORHOODS = [
-      [0,0,0], // bit0
-      [0,0,1], // bit1
-      [0,1,0], // bit2
-      [0,1,1], // bit3
-      [1,0,0], // bit4
-      [1,0,1], // bit5
-      [1,1,0], // bit6
-      [1,1,1]  // bit7
-];
-  </script>
-
-  <script src="controls.js"></script>
-  <script src="ca.js"></script>
-  <script src="simulation.js"></script>
-
-
-  <!-- Main Application View -->
-  <div id="main-view">
-    <div id="menubar">
-      <div class="menubar-content">
-        <div class="controls">
-          <label>Rule:</label>
-          <input type="text" id="rule-input" value="30">
-          <label>Pattern:</label>
-          <input type="text" id="initial-input" placeholder="e.g. 00111">
-          <label>Mode:</label>
-          <input type="radio" name="mode" value="Binary" checked> Binary
-          <input type="radio" name="mode" value="RuleIndex"> Rule Index
-          <label>Generations:</label>
-          <input type="range" id="steps-slider" min="1" max="500" value="100">
-          <span id="steps-value">100</span>
-          <label>Width:</label>
-          <input type="range" id="width-slider" min="50" max="500" value="101">
-          <span id="width-value">101</span>
-          <input type="checkbox" id="toroidal-checkbox" checked> Toroidal
-          <button id="run-button">Run ECA</button>
-        </div>
-      </div>
-    </div>
-    <div id="canvas-container">
-      <canvas id="ca-canvas"></canvas>
-    </div>
-  </div>
-
-
-  <script>
-    initControls();
-  </script>
-
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React + TS</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>

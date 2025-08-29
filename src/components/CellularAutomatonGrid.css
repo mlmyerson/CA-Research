@@ -1,0 +1,32 @@
+/* Cellular Automaton Grid Styles */
+.cellular-automaton-grid {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cellular-automaton-grid .cell {
+  box-sizing: border-box;
+}
+
+.cellular-automaton-grid .cell.alive {
+  background-color: #000;
+}
+
+.cellular-automaton-grid .cell.dead {
+  background-color: #fff;
+}
+
+.cellular-automaton-grid .cell:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .cellular-automaton-grid {
+    margin: 10px auto;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
