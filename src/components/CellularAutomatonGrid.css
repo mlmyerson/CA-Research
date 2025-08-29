@@ -9,12 +9,46 @@
   box-sizing: border-box;
 }
 
+/* Binary mode styles */
 .cellular-automaton-grid .cell.alive {
   background-color: #000;
 }
 
 .cellular-automaton-grid .cell.dead {
   background-color: #fff;
+}
+
+/* State mode styles (0-7) */
+.cellular-automaton-grid .cell.state-0 {
+  background-color: #fff;
+}
+
+.cellular-automaton-grid .cell.state-1 {
+  background-color: #ff0000;
+}
+
+.cellular-automaton-grid .cell.state-2 {
+  background-color: #00ff00;
+}
+
+.cellular-automaton-grid .cell.state-3 {
+  background-color: #0000ff;
+}
+
+.cellular-automaton-grid .cell.state-4 {
+  background-color: #ffff00;
+}
+
+.cellular-automaton-grid .cell.state-5 {
+  background-color: #ff00ff;
+}
+
+.cellular-automaton-grid .cell.state-6 {
+  background-color: #00ffff;
+}
+
+.cellular-automaton-grid .cell.state-7 {
+  background-color: #000000;
 }
 
 .cellular-automaton-grid .cell:hover {

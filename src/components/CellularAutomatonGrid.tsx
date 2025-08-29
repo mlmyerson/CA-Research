@@ -18,11 +18,41 @@ const CellularAutomatonGrid = ({
   lightconeLength,
   cellSize,
   data,
+  mode,
   className = ''
 }: CellularAutomatonGridProps) => {
   // Calculate grid dimensions
   const gridWidth = latticeWidth * cellSize;
   const gridHeight = lightconeLength * cellSize;
+
+  // Get cell color based on mode and value
+  const getCellColor = (value: number): string => {
+    if (mode === 'binary') {
+      return value === 0 ? '#fff' : '#000';
+    } else {
+      // State mode: different colors for each rule (0-7)
+      const stateColors = [
+        '#fff',     // 0 - white
+        '#ff0000',  // 1 - red
+        '#00ff00',  // 2 - green
+        '#0000ff',  // 3 - blue
+        '#ffff00',  // 4 - yellow
+        '#ff00ff',  // 5 - magenta
+        '#00ffff',  // 6 - cyan
+        '#000000',  // 7 - black
+      ];
+      return stateColors[value] || '#fff';
+    }
+  };
+
+  // Get cell CSS class based on mode and value
+  const getCellClass = (value: number): string => {
+    if (mode === 'binary') {
+      return value === 0 ? 'dead' : 'alive';
+    } else {
+      return `state-${value}`;
+    }
+  };
 
   return (
     <div 
@@ -40,18 +70,19 @@ const CellularAutomatonGrid = ({
     >
       {Array.from({ length: lightconeLength }, (_, generation) =>
         Array.from({ length: latticeWidth }, (_, position) => {
-          const isAlive = data[generation]?.[position] || false;
+          const cellValue = data[generation]?.[position] || 0;
           return (
             <div
               key={`cell-${generation}-${position}`}
-              className={`cell ${isAlive ? 'alive' : 'dead'}`}
+              className={`cell ${getCellClass(cellValue)}`}
               style={{
                 width: cellSize,
                 height: cellSize,
-                backgroundColor: isAlive ? '#000' : '#fff',
+                backgroundColor: getCellColor(cellValue),
                 border: '0.5px solid #eee',
                 transition: 'background-color 0.2s ease'
               }}
+              title={mode === 'state' ? `Rule: ${cellValue}` : `Value: ${cellValue}`}
             />
           );
         })
