@@ -85,12 +85,16 @@ const generateCellularAutomaton = (
 function App() {
   const [latticeWidth, setLatticeWidth] = useState(101);
   const [lightconeLength, setLightconeLength] = useState(50);
-  const [cellSize, setCellSize] = useState(8);
   const [rule, setRule] = useState(30);
   const [mode, setMode] = useState<'binary' | 'state'>('binary');
   const [data, setData] = useState<number[][]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [parametersExpanded, setParametersExpanded] = useState(true);
+  
+  // Zoom and pan state
+  const [zoom, setZoom] = useState(1);
+  const [panX, setPanX] = useState(0);
+  const [panY, setPanY] = useState(0);
 
   // Generate data when parameters change
   useEffect(() => {
@@ -156,7 +160,7 @@ function App() {
               <ListItemButton onClick={toggleParameters}>
                 <ListItemText 
                   primary="Parameters" 
-                  secondary={!parametersExpanded ? `Rule ${rule} • ${latticeWidth}×${lightconeLength} • ${cellSize}px • ${mode}` : undefined}
+                  secondary={!parametersExpanded ? `Rule ${rule} • ${latticeWidth}×${lightconeLength} • ${mode}` : undefined}
                 />
                 {parametersExpanded ? <ExpandLess /> : <ExpandMore />}
               </ListItemButton>
@@ -183,18 +187,6 @@ function App() {
                           value={lightconeLength}
                           onChange={(e) => setLightconeLength(parseInt(e.target.value))}
                           inputProps={{ min: 10, max: 100 }}
-                          fullWidth
-                          size="small"
-                        />
-                      </Grid>
-                      
-                      <Grid size={{ xs: 12 }}>
-                        <TextField
-                          label="Cell Size"
-                          type="number"
-                          value={cellSize}
-                          onChange={(e) => setCellSize(parseInt(e.target.value))}
-                          inputProps={{ min: 2, max: 20 }}
                           fullWidth
                           size="small"
                         />
@@ -242,12 +234,23 @@ function App() {
               <CellularAutomatonGrid
                 latticeWidth={latticeWidth}
                 lightconeLength={lightconeLength}
-                cellSize={cellSize}
+                zoom={zoom}
+                panX={panX}
+                panY={panY}
+                onZoom={setZoom}
+                onPan={(x, y) => { setPanX(x); setPanY(y); }}
                 data={data}
                 mode={mode}
                 className="main-grid"
               />
             </Box>
+            
+            {/* Instructions */}
+            <Paper elevation={0} sx={{ p: 2, mb: 2, bgcolor: 'grey.50' }}>
+              <Typography variant="caption" display="block" align="center" color="text.secondary">
+                💡 <strong>Mouse wheel</strong> to zoom • <strong>Click and drag</strong> to pan when zoomed
+              </Typography>
+            </Paper>
             
             {/* Status Section */}
             <Paper elevation={1} sx={{ p: 2, textAlign: 'center' }}>
@@ -259,6 +262,12 @@ function App() {
                   label={`${mode} mode`} 
                   color={mode === 'binary' ? 'primary' : 'secondary'} 
                   size="small" 
+                />
+                <Chip 
+                  label={`${Math.round(zoom * 100)}% zoom`} 
+                  variant="outlined"
+                  size="small" 
+                  color={zoom > 2 ? 'warning' : zoom < 0.5 ? 'info' : 'default'}
                 />
               </Box>
               {mode === 'state' && (
