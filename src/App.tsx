@@ -50,7 +50,7 @@ const generateCellularAutomaton = (
   mode: 'binary' | 'state' = 'binary'
 ): number[][] => {
   // Validate inputs to prevent crashes
-  if (width < 1 || generations < 1 || rule < 0 || rule > 255) {
+  if (width < 3 || generations < 1 || rule < 0 || rule > 255) {
     console.warn('Invalid parameters for cellular automaton generation');
     return [];
   }
@@ -705,11 +705,11 @@ function App() {
                           value={latticeWidth}
                           onChange={(e) => {
                             const value = parseInt(e.target.value);
-                            if (!isNaN(value) && value >= 1 && value <= 200) {
+                            if (!isNaN(value) && value >= 3) {
                               setLatticeWidth(value);
                             }
                           }}
-                          inputProps={{ min: 1, max: 200 }}
+                          inputProps={{ min: 3 }}
                           fullWidth
                           size="small"
                         />
@@ -722,11 +722,11 @@ function App() {
                           value={lightconeLength}
                           onChange={(e) => {
                             const value = parseInt(e.target.value);
-                            if (!isNaN(value) && value >= 1 && value <= 100) {
+                            if (!isNaN(value) && value >= 1) {
                               setLightconeLength(value);
                             }
                           }}
-                          inputProps={{ min: 1, max: 100 }}
+                          inputProps={{ min: 1 }}
                           fullWidth
                           size="small"
                         />
