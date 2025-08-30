@@ -30,6 +30,8 @@ interface CellularAutomatonGridProps {
   deadColor: string;
   /** Colors for state mode (array of 8 colors for states 0-7) */
   stateColors: string[];
+  /** Saved regex patterns with colors for highlighting */
+  savedRegexes: {pattern: string, color: string}[];
   /** Optional CSS class name */
   className?: string;
 }
@@ -49,6 +51,7 @@ const CellularAutomatonGrid = ({
   aliveColor,
   deadColor,
   stateColors,
+  savedRegexes,
   className = ''
 }: CellularAutomatonGridProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -67,6 +70,58 @@ const CellularAutomatonGrid = ({
       // State mode: use custom colors from stateColors array
       return stateColors[value] || stateColors[0] || '#ffffff';
     }
+  };
+
+  // Check if a generation matches any regex pattern
+  const getRegexMatches = (generation: number[]): {pattern: string, color: string, matches: number[][]}[] => {
+    const generationString = generation.join('');
+    const results: {pattern: string, color: string, matches: number[][]}[] = [];
+    
+    savedRegexes.forEach(({pattern, color}) => {
+      try {
+        const regex = new RegExp(pattern, 'g');
+        const matches: number[][] = [];
+        let match;
+        
+        while ((match = regex.exec(generationString)) !== null) {
+          const startIndex = match.index;
+          const endIndex = startIndex + match[0].length - 1;
+          matches.push([startIndex, endIndex]);
+          
+          // Prevent infinite loop on zero-length matches
+          if (match[0].length === 0) {
+            regex.lastIndex++;
+          }
+        }
+        
+        if (matches.length > 0) {
+          results.push({pattern, color, matches});
+        }
+      } catch (error) {
+        // Invalid regex pattern, skip
+        console.warn(`Invalid regex pattern: ${pattern}`, error);
+      }
+    });
+    
+    return results;
+  };
+
+  // Get regex color for a specific cell position, returns null if no match
+  const getRegexColorForPosition = (generation: number[], position: number): string | null => {
+    const regexMatches = getRegexMatches(generation);
+    
+    // Check if this position is covered by any regex match
+    // If multiple patterns match the same position, use the last one (most recent)
+    for (let i = regexMatches.length - 1; i >= 0; i--) {
+      const {color, matches} = regexMatches[i];
+      for (const [startPos, endPos] of matches) {
+        if (position >= startPos && position <= endPos) {
+          return color;
+        }
+      }
+    }
+    
+    return null;
   };
 
   // Draw the cellular automaton to canvas
@@ -115,8 +170,10 @@ const CellularAutomatonGrid = ({
 
     // Draw each cell
     for (let generation = 0; generation < lightconeLength; generation++) {
+      const generationData = data[generation] || [];
+      
       for (let position = 0; position < latticeWidth; position++) {
-        const cellValue = data[generation]?.[position] || 0;
+        const cellValue = generationData[position] || 0;
         
         const x = offsetX + position * scaledCellSize;
         const y = offsetY + generation * scaledCellSize;
@@ -126,13 +183,15 @@ const CellularAutomatonGrid = ({
             y + scaledCellSize >= 0 && y <= canvas.height) {
           
           if (displayMode === 'colors') {
-            // Color mode: fill with colors
-            const color = getCellColor(cellValue);
+            // Color mode: fill with colors (regex color overrides cell color)
+            const regexColor = getRegexColorForPosition(generationData, position);
+            const color = regexColor || getCellColor(cellValue);
             ctx.fillStyle = color;
             ctx.fillRect(x, y, scaledCellSize, scaledCellSize);
           } else {
             // Numbers mode: fill with background and draw text
-            ctx.fillStyle = darkMode ? '#1a1a1a' : '#f5f5f5';
+            const regexColor = getRegexColorForPosition(generationData, position);
+            ctx.fillStyle = regexColor || (darkMode ? '#1a1a1a' : '#f5f5f5');
             ctx.fillRect(x, y, scaledCellSize, scaledCellSize);
             
             // Draw border for grid effect
@@ -161,7 +220,7 @@ const CellularAutomatonGrid = ({
         }
       }
     }
-  }, [data, latticeWidth, lightconeLength, zoom, panX, panY, mode, displayMode, darkMode, aliveColor, deadColor, stateColors, baseCellSize, getCellColor, onPan]);
+  }, [data, latticeWidth, lightconeLength, zoom, panX, panY, mode, displayMode, darkMode, aliveColor, deadColor, stateColors, savedRegexes, baseCellSize, getCellColor, getRegexColorForPosition, onPan]);
 
   // Redraw when data or view parameters change
   useEffect(() => {

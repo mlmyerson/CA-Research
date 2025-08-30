@@ -16,7 +16,6 @@ import {
   ListItemButton,
   ListItemText,
   Button,
-  Chip,
   Switch,
   FormControlLabel
 } from '@mui/material';
@@ -102,7 +101,8 @@ function App() {
   const [generalExpanded, setGeneralExpanded] = useState(false);
   const [regexExpanded, setRegexExpanded] = useState(false);
   const [currentRegex, setCurrentRegex] = useState('');
-  const [savedRegexes, setSavedRegexes] = useState<string[]>([]);
+  const [currentRegexColor, setCurrentRegexColor] = useState('#ff0000');
+  const [savedRegexes, setSavedRegexes] = useState<{pattern: string, color: string}[]>([]);
   const [darkMode, setDarkMode] = useState(false);
   const [binaryColorsExpanded, setBinaryColorsExpanded] = useState(false);
   const [aliveColor, setAliveColor] = useState('#000000');
@@ -290,6 +290,7 @@ function App() {
     // Clear saved regexes
     setSavedRegexes([]);
     setCurrentRegex('');
+    setCurrentRegexColor('#ff0000');
   };
 
   const exportSettings = () => {
@@ -304,6 +305,7 @@ function App() {
       deadColor,
       stateColors,
       savedRegexes,
+      currentRegexColor,
       zoom,
       panX,
       panY,
@@ -357,6 +359,7 @@ function App() {
           if (settings.deadColor !== undefined) setDeadColor(settings.deadColor);
           if (settings.stateColors !== undefined) setStateColors(settings.stateColors);
           if (settings.savedRegexes !== undefined) setSavedRegexes(settings.savedRegexes);
+          if (settings.currentRegexColor !== undefined) setCurrentRegexColor(settings.currentRegexColor);
           if (settings.zoom !== undefined) setZoom(settings.zoom);
           if (settings.panX !== undefined) setPanX(settings.panX);
           if (settings.panY !== undefined) setPanY(settings.panY);
@@ -470,14 +473,20 @@ function App() {
   };
 
   const saveRegex = () => {
-    if (currentRegex.trim() && !savedRegexes.includes(currentRegex.trim())) {
-      setSavedRegexes([...savedRegexes, currentRegex.trim()]);
+    if (currentRegex.trim() && !savedRegexes.some(r => r.pattern === currentRegex.trim())) {
+      setSavedRegexes([...savedRegexes, { pattern: currentRegex.trim(), color: currentRegexColor }]);
       setCurrentRegex('');
     }
   };
 
-  const removeRegex = (regexToRemove: string) => {
-    setSavedRegexes(savedRegexes.filter(regex => regex !== regexToRemove));
+  const removeRegex = (regexToRemove: {pattern: string, color: string}) => {
+    setSavedRegexes(savedRegexes.filter(regex => regex.pattern !== regexToRemove.pattern));
+  };
+
+  const updateRegexColor = (pattern: string, newColor: string) => {
+    setSavedRegexes(savedRegexes.map(regex => 
+      regex.pattern === pattern ? { ...regex, color: newColor } : regex
+    ));
   };
 
   // Create dynamic theme based on dark mode
@@ -831,7 +840,7 @@ function App() {
                 <Box sx={{ px: 2, pb: 2 }}>
                   <Paper elevation={2} sx={{ p: 3 }}>
                     <Grid container spacing={3}>
-                      <Grid size={{ xs: 8 }}>
+                      <Grid size={{ xs: 6 }}>
                         <TextField
                           label="Enter Regex Pattern"
                           value={currentRegex}
@@ -842,11 +851,28 @@ function App() {
                           helperText="Enter a regular expression pattern"
                         />
                       </Grid>
-                      <Grid size={{ xs: 4 }}>
+                      <Grid size={{ xs: 3 }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="body2">Color</Typography>
+                          <input
+                            type="color"
+                            value={currentRegexColor}
+                            onChange={(e) => setCurrentRegexColor(e.target.value)}
+                            style={{
+                              width: '40px',
+                              height: '40px',
+                              border: 'none',
+                              borderRadius: '4px',
+                              cursor: 'pointer'
+                            }}
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid size={{ xs: 3 }}>
                         <Button
                           variant="contained"
                           onClick={saveRegex}
-                          disabled={!currentRegex.trim() || savedRegexes.includes(currentRegex.trim())}
+                          disabled={!currentRegex.trim() || savedRegexes.some(r => r.pattern === currentRegex.trim())}
                           fullWidth
                           size="small"
                           sx={{ height: '40px' }}
@@ -860,20 +886,58 @@ function App() {
                           <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
                             Saved Regex Patterns ({savedRegexes.length})
                           </Typography>
-                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
                             {savedRegexes.map((regex, index) => (
-                              <Chip
-                                key={index}
-                                label={regex}
-                                onDelete={() => removeRegex(regex)}
-                                size="small"
-                                variant="outlined"
-                                sx={{
-                                  fontFamily: 'monospace',
-                                  fontSize: '0.75rem',
-                                  maxWidth: '100%'
-                                }}
-                              />
+                              <Box key={index} sx={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: 1, 
+                                p: 2, 
+                                border: '1px solid',
+                                borderColor: darkMode ? '#333' : '#ddd',
+                                borderRadius: 1,
+                                backgroundColor: darkMode ? '#1e1e1e' : '#f9f9f9'
+                              }}>
+                                <Box sx={{ flex: 1, minWidth: 0 }}>
+                                  <Typography 
+                                    variant="body2" 
+                                    sx={{ 
+                                      fontFamily: 'monospace',
+                                      fontSize: '0.8rem',
+                                      wordBreak: 'break-all'
+                                    }}
+                                  >
+                                    {regex.pattern}
+                                  </Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <Typography variant="body2" sx={{ minWidth: '40px' }}>Color:</Typography>
+                                  <input
+                                    type="color"
+                                    value={regex.color}
+                                    onChange={(e) => updateRegexColor(regex.pattern, e.target.value)}
+                                    style={{
+                                      width: '40px',
+                                      height: '30px',
+                                      border: 'none',
+                                      borderRadius: '4px',
+                                      cursor: 'pointer'
+                                    }}
+                                  />
+                                  <Typography variant="caption" sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}>
+                                    {regex.color}
+                                  </Typography>
+                                </Box>
+                                <Button
+                                  variant="outlined"
+                                  size="small"
+                                  color="error"
+                                  onClick={() => removeRegex(regex)}
+                                  sx={{ minWidth: 'auto', px: 1 }}
+                                >
+                                  ×
+                                </Button>
+                              </Box>
                             ))}
                           </Box>
                         </Grid>
@@ -904,6 +968,7 @@ function App() {
             aliveColor={aliveColor}
             deadColor={deadColor}
             stateColors={stateColors}
+            savedRegexes={savedRegexes}
             className="main-grid"
           />
         </Box>
