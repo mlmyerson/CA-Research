@@ -93,6 +93,10 @@ function App() {
   const [displayMode, setDisplayMode] = useState<'colors' | 'numbers'>('colors');
   const [data, setData] = useState<number[][]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  
+  // Temporary input values for debouncing
+  const [latticeWidthInput, setLatticeWidthInput] = useState('101');
+  const [lightconeLengthInput, setLightconeLengthInput] = useState('50');
   const [parametersExpanded, setParametersExpanded] = useState(true);
   const [generalExpanded, setGeneralExpanded] = useState(false);
   const [regexExpanded, setRegexExpanded] = useState(false);
@@ -124,6 +128,46 @@ function App() {
     const newData = generateCellularAutomaton(latticeWidth, lightconeLength, rule, mode);
     setData(newData);
   }, [latticeWidth, lightconeLength, rule, mode]);
+
+  // Debounced validation for lattice width
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const value = parseInt(latticeWidthInput);
+      if (latticeWidthInput === '' || isNaN(value) || value < 3) {
+        const correctedValue = 3;
+        setLatticeWidth(correctedValue);
+        setLatticeWidthInput(correctedValue.toString());
+      } else if (value > 500) {
+        const correctedValue = 500;
+        setLatticeWidth(correctedValue);
+        setLatticeWidthInput(correctedValue.toString());
+      } else {
+        setLatticeWidth(value);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [latticeWidthInput]);
+
+  // Debounced validation for generations
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const value = parseInt(lightconeLengthInput);
+      if (lightconeLengthInput === '' || isNaN(value) || value < 1) {
+        const correctedValue = 1;
+        setLightconeLength(correctedValue);
+        setLightconeLengthInput(correctedValue.toString());
+      } else if (value > 500) {
+        const correctedValue = 500;
+        setLightconeLength(correctedValue);
+        setLightconeLengthInput(correctedValue.toString());
+      } else {
+        setLightconeLength(value);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [lightconeLengthInput]);
 
   // Calculate optimal initial zoom to fit the image to the viewport
   useEffect(() => {
@@ -186,6 +230,8 @@ function App() {
     // Reset all parameters to default values
     setLatticeWidth(101);
     setLightconeLength(50);
+    setLatticeWidthInput('101');
+    setLightconeLengthInput('50');
     setRule(30);
     setMode('binary');
     setDisplayMode('colors');
@@ -270,8 +316,14 @@ function App() {
           const settings = JSON.parse(e.target?.result as string);
           
           // Apply imported settings
-          if (settings.latticeWidth !== undefined) setLatticeWidth(settings.latticeWidth);
-          if (settings.lightconeLength !== undefined) setLightconeLength(settings.lightconeLength);
+          if (settings.latticeWidth !== undefined) {
+            setLatticeWidth(settings.latticeWidth);
+            setLatticeWidthInput(settings.latticeWidth.toString());
+          }
+          if (settings.lightconeLength !== undefined) {
+            setLightconeLength(settings.lightconeLength);
+            setLightconeLengthInput(settings.lightconeLength.toString());
+          }
           if (settings.rule !== undefined) setRule(settings.rule);
           if (settings.mode !== undefined) setMode(settings.mode);
           if (settings.displayMode !== undefined) setDisplayMode(settings.displayMode);
@@ -702,14 +754,11 @@ function App() {
                         <TextField
                           label="Lattice Width"
                           type="number"
-                          value={latticeWidth}
+                          value={latticeWidthInput}
                           onChange={(e) => {
-                            const value = parseInt(e.target.value);
-                            if (!isNaN(value) && value >= 3) {
-                              setLatticeWidth(value);
-                            }
+                            setLatticeWidthInput(e.target.value);
                           }}
-                          inputProps={{ min: 3 }}
+                          inputProps={{ min: 3, max: 500 }}
                           fullWidth
                           size="small"
                         />
@@ -719,14 +768,11 @@ function App() {
                         <TextField
                           label="Generations"
                           type="number"
-                          value={lightconeLength}
+                          value={lightconeLengthInput}
                           onChange={(e) => {
-                            const value = parseInt(e.target.value);
-                            if (!isNaN(value) && value >= 1) {
-                              setLightconeLength(value);
-                            }
+                            setLightconeLengthInput(e.target.value);
                           }}
-                          inputProps={{ min: 1 }}
+                          inputProps={{ min: 1, max: 500 }}
                           fullWidth
                           size="small"
                         />
