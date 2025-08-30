@@ -49,6 +49,12 @@ const generateCellularAutomaton = (
   rule: number = 30,
   mode: 'binary' | 'state' = 'binary'
 ): number[][] => {
+  // Validate inputs to prevent crashes
+  if (width < 1 || generations < 1 || rule < 0 || rule > 255) {
+    console.warn('Invalid parameters for cellular automaton generation');
+    return [];
+  }
+  
   const data: number[][] = [];
   
   // Initialize first generation with single center cell
@@ -697,8 +703,13 @@ function App() {
                           label="Lattice Width"
                           type="number"
                           value={latticeWidth}
-                          onChange={(e) => setLatticeWidth(parseInt(e.target.value))}
-                          inputProps={{ min: 10, max: 200 }}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            if (!isNaN(value) && value >= 1 && value <= 200) {
+                              setLatticeWidth(value);
+                            }
+                          }}
+                          inputProps={{ min: 1, max: 200 }}
                           fullWidth
                           size="small"
                         />
@@ -709,8 +720,13 @@ function App() {
                           label="Generations"
                           type="number"
                           value={lightconeLength}
-                          onChange={(e) => setLightconeLength(parseInt(e.target.value))}
-                          inputProps={{ min: 10, max: 100 }}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            if (!isNaN(value) && value >= 1 && value <= 100) {
+                              setLightconeLength(value);
+                            }
+                          }}
+                          inputProps={{ min: 1, max: 100 }}
                           fullWidth
                           size="small"
                         />
@@ -721,7 +737,12 @@ function App() {
                           label="Rule"
                           type="number"
                           value={rule}
-                          onChange={(e) => setRule(parseInt(e.target.value))}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            if (!isNaN(value) && value >= 0 && value <= 255) {
+                              setRule(value);
+                            }
+                          }}
                           inputProps={{ min: 0, max: 255 }}
                           fullWidth
                           size="small"
