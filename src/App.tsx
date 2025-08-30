@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { ThemeProvider } from '@mui/material/styles';
+import { useState, useEffect, useMemo } from 'react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import {
   Typography,
@@ -20,7 +20,9 @@ import {
   ListItemButton,
   ListItemText,
   Button,
-  Chip
+  Chip,
+  Switch,
+  FormControlLabel
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -28,7 +30,6 @@ import {
   ExpandLess,
   ExpandMore
 } from '@mui/icons-material';
-import { theme } from './theme';
 import CellularAutomatonGrid from './components/CellularAutomatonGrid';
 import './components/CellularAutomatonGrid.css';
 
@@ -94,6 +95,7 @@ function App() {
   const [regexExpanded, setRegexExpanded] = useState(false);
   const [currentRegex, setCurrentRegex] = useState('');
   const [savedRegexes, setSavedRegexes] = useState<string[]>([]);
+  const [nightMode, setNightMode] = useState(false);
   
   // Zoom and pan state
   const [zoom, setZoom] = useState(1);
@@ -155,8 +157,42 @@ function App() {
     setSavedRegexes(savedRegexes.filter(regex => regex !== regexToRemove));
   };
 
+  // Create dynamic theme based on night mode
+  const dynamicTheme = useMemo(() => createTheme({
+    palette: {
+      mode: nightMode ? 'dark' : 'light',
+      background: {
+        default: nightMode ? '#000000' : '#ffffff',
+        paper: nightMode ? '#121212' : '#ffffff',
+      },
+      primary: {
+        main: nightMode ? '#90caf9' : '#1976d2',
+      },
+      text: {
+        primary: nightMode ? '#ffffff' : '#000000',
+        secondary: nightMode ? '#b0b0b0' : '#666666',
+      },
+    },
+    components: {
+      MuiAppBar: {
+        styleOverrides: {
+          root: {
+            backgroundColor: nightMode ? '#000000' : '#1976d2',
+          },
+        },
+      },
+      MuiDrawer: {
+        styleOverrides: {
+          paper: {
+            backgroundColor: nightMode ? '#121212' : '#ffffff',
+          },
+        },
+      },
+    },
+  }), [nightMode]);
+
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={dynamicTheme}>
       <CssBaseline />
       <Box sx={{ display: 'flex' }}>
         {/* App Bar */}
@@ -213,17 +249,16 @@ function App() {
                   <Paper elevation={2} sx={{ p: 3 }}>
                     <Grid container spacing={3}>
                       <Grid size={{ xs: 12 }}>
-                        <FormControl fullWidth size="small">
-                          <InputLabel>Night Mode</InputLabel>
-                          <Select
-                            value="off"
-                            label="Night Mode"
-                            disabled
-                          >
-                            <MenuItem value="off">Off</MenuItem>
-                            <MenuItem value="on">On</MenuItem>
-                          </Select>
-                        </FormControl>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={nightMode}
+                              onChange={(e) => setNightMode(e.target.checked)}
+                              name="nightMode"
+                            />
+                          }
+                          label="Night Mode"
+                        />
                       </Grid>
                       
                       <Grid size={{ xs: 12 }}>
@@ -414,6 +449,7 @@ function App() {
             onPan={(x, y) => { setPanX(x); setPanY(y); }}
             data={data}
             mode={mode}
+            nightMode={nightMode}
             className="main-grid"
           />
         </Box>
