@@ -97,6 +97,7 @@ function App() {
   // Temporary input values for debouncing
   const [latticeWidthInput, setLatticeWidthInput] = useState('101');
   const [lightconeLengthInput, setLightconeLengthInput] = useState('50');
+  const [ruleInput, setRuleInput] = useState('30');
   const [parametersExpanded, setParametersExpanded] = useState(true);
   const [generalExpanded, setGeneralExpanded] = useState(false);
   const [regexExpanded, setRegexExpanded] = useState(false);
@@ -169,6 +170,26 @@ function App() {
     return () => clearTimeout(timer);
   }, [lightconeLengthInput]);
 
+  // Debounced validation for rule
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const value = parseInt(ruleInput);
+      if (ruleInput === '' || isNaN(value) || value < 0) {
+        const correctedValue = 0;
+        setRule(correctedValue);
+        setRuleInput(correctedValue.toString());
+      } else if (value > 255) {
+        const correctedValue = 255;
+        setRule(correctedValue);
+        setRuleInput(correctedValue.toString());
+      } else {
+        setRule(value);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [ruleInput]);
+
   // Calculate optimal initial zoom to fit the image to the viewport
   useEffect(() => {
     const baseCellSize = 4;
@@ -233,6 +254,7 @@ function App() {
     setLatticeWidthInput('101');
     setLightconeLengthInput('50');
     setRule(30);
+    setRuleInput('30');
     setMode('binary');
     setDisplayMode('colors');
     setDarkMode(false);
@@ -324,7 +346,10 @@ function App() {
             setLightconeLength(settings.lightconeLength);
             setLightconeLengthInput(settings.lightconeLength.toString());
           }
-          if (settings.rule !== undefined) setRule(settings.rule);
+          if (settings.rule !== undefined) {
+            setRule(settings.rule);
+            setRuleInput(settings.rule.toString());
+          }
           if (settings.mode !== undefined) setMode(settings.mode);
           if (settings.displayMode !== undefined) setDisplayMode(settings.displayMode);
           if (settings.darkMode !== undefined) setDarkMode(settings.darkMode);
@@ -782,12 +807,9 @@ function App() {
                         <TextField
                           label="Rule"
                           type="number"
-                          value={rule}
+                          value={ruleInput}
                           onChange={(e) => {
-                            const value = parseInt(e.target.value);
-                            if (!isNaN(value) && value >= 0 && value <= 255) {
-                              setRule(value);
-                            }
+                            setRuleInput(e.target.value);
                           }}
                           inputProps={{ min: 0, max: 255 }}
                           fullWidth
