@@ -5,10 +5,6 @@ import {
   Typography,
   Box,
   TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Grid,
   Paper,
   Drawer,
@@ -730,20 +726,6 @@ function App() {
                           fullWidth
                           size="small"
                         />
-                      </Grid>
-                      
-                      <Grid size={{ xs: 12 }}>
-                        <FormControl fullWidth size="small">
-                          <InputLabel>Mode</InputLabel>
-                          <Select
-                            value={mode}
-                            label="Mode"
-                            onChange={(e) => setMode(e.target.value as 'binary' | 'state')}
-                          >
-                            <MenuItem value="binary">Binary</MenuItem>
-                            <MenuItem value="state">State</MenuItem>
-                          </Select>
-                        </FormControl>
                       </Grid>
                     </Grid>
                   </Paper>
