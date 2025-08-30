@@ -18,7 +18,9 @@ import {
   Collapse,
   List,
   ListItemButton,
-  ListItemText
+  ListItemText,
+  Button,
+  Chip
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -89,6 +91,9 @@ function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [parametersExpanded, setParametersExpanded] = useState(true);
   const [generalExpanded, setGeneralExpanded] = useState(false);
+  const [regexExpanded, setRegexExpanded] = useState(false);
+  const [currentRegex, setCurrentRegex] = useState('');
+  const [savedRegexes, setSavedRegexes] = useState<string[]>([]);
   
   // Zoom and pan state
   const [zoom, setZoom] = useState(1);
@@ -133,6 +138,21 @@ function App() {
 
   const toggleGeneral = () => {
     setGeneralExpanded(!generalExpanded);
+  };
+
+  const toggleRegex = () => {
+    setRegexExpanded(!regexExpanded);
+  };
+
+  const saveRegex = () => {
+    if (currentRegex.trim() && !savedRegexes.includes(currentRegex.trim())) {
+      setSavedRegexes([...savedRegexes, currentRegex.trim()]);
+      setCurrentRegex('');
+    }
+  };
+
+  const removeRegex = (regexToRemove: string) => {
+    setSavedRegexes(savedRegexes.filter(regex => regex !== regexToRemove));
   };
 
   return (
@@ -311,6 +331,68 @@ function App() {
                           </Select>
                         </FormControl>
                       </Grid>
+                    </Grid>
+                  </Paper>
+                </Box>
+              </Collapse>
+              
+              <ListItemButton onClick={toggleRegex}>
+                <ListItemText 
+                  primary="Regex" 
+                />
+                {regexExpanded ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+              <Collapse in={regexExpanded} timeout="auto" unmountOnExit>
+                <Box sx={{ px: 2, pb: 2 }}>
+                  <Paper elevation={2} sx={{ p: 3 }}>
+                    <Grid container spacing={3}>
+                      <Grid size={{ xs: 8 }}>
+                        <TextField
+                          label="Enter Regex Pattern"
+                          value={currentRegex}
+                          onChange={(e) => setCurrentRegex(e.target.value)}
+                          fullWidth
+                          size="small"
+                          placeholder="e.g., \\d{3}-\\d{2}-\\d{4}"
+                          helperText="Enter a regular expression pattern"
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 4 }}>
+                        <Button
+                          variant="contained"
+                          onClick={saveRegex}
+                          disabled={!currentRegex.trim() || savedRegexes.includes(currentRegex.trim())}
+                          fullWidth
+                          size="small"
+                          sx={{ height: '40px' }}
+                        >
+                          Save
+                        </Button>
+                      </Grid>
+                      
+                      {savedRegexes.length > 0 && (
+                        <Grid size={{ xs: 12 }}>
+                          <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
+                            Saved Regex Patterns ({savedRegexes.length})
+                          </Typography>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                            {savedRegexes.map((regex, index) => (
+                              <Chip
+                                key={index}
+                                label={regex}
+                                onDelete={() => removeRegex(regex)}
+                                size="small"
+                                variant="outlined"
+                                sx={{
+                                  fontFamily: 'monospace',
+                                  fontSize: '0.75rem',
+                                  maxWidth: '100%'
+                                }}
+                              />
+                            ))}
+                          </Box>
+                        </Grid>
+                      )}
                     </Grid>
                   </Paper>
                 </Box>
