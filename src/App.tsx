@@ -294,26 +294,100 @@ function App() {
   };
 
   const exportPNG = () => {
-    // We'll need to get the canvas from the CellularAutomatonGrid component
-    // For now, we'll create a simple implementation
-    const canvas = document.querySelector('canvas');
-    if (!canvas) {
-      alert('No canvas found to export');
+    if (!data.length) {
+      alert('No cellular automaton data to export');
       return;
     }
+
+    // Create a high-resolution canvas for export
+    const exportCanvas = document.createElement('canvas');
+    const ctx = exportCanvas.getContext('2d');
+    if (!ctx) {
+      alert('Failed to create export canvas');
+      return;
+    }
+
+    // High-quality settings
+    const exportCellSize = 16; // Higher resolution for readable numbers
+    const exportWidth = latticeWidth * exportCellSize;
+    const exportHeight = lightconeLength * exportCellSize;
     
-    canvas.toBlob((blob) => {
-      if (!blob) return;
+    // Set canvas size to full resolution
+    exportCanvas.width = exportWidth;
+    exportCanvas.height = exportHeight;
+    
+    // Enable high-quality rendering
+    ctx.imageSmoothingEnabled = false; // Keep crisp edges for cellular automaton
+    
+    // Clear with black background
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, exportWidth, exportHeight);
+
+    // Helper function to get cell color
+    const getExportCellColor = (value: number): string => {
+      if (mode === 'binary') {
+        return value === 0 ? deadColor : aliveColor;
+      } else {
+        return stateColors[value] || stateColors[0] || '#ffffff';
+      }
+    };
+
+    // Draw each cell at high resolution
+    for (let generation = 0; generation < lightconeLength; generation++) {
+      for (let position = 0; position < latticeWidth; position++) {
+        const cellValue = data[generation]?.[position] || 0;
+        
+        const x = position * exportCellSize;
+        const y = generation * exportCellSize;
+        
+        if (displayMode === 'colors') {
+          // Color mode: fill with colors
+          const color = getExportCellColor(cellValue);
+          ctx.fillStyle = color;
+          ctx.fillRect(x, y, exportCellSize, exportCellSize);
+        } else {
+          // Numbers mode: fill with background and draw text
+          ctx.fillStyle = darkMode ? '#1a1a1a' : '#f5f5f5';
+          ctx.fillRect(x, y, exportCellSize, exportCellSize);
+          
+          // Draw border for grid effect
+          ctx.strokeStyle = darkMode ? '#333333' : '#cccccc';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x, y, exportCellSize, exportCellSize);
+          
+          // Draw number if cell has a non-zero value
+          if (cellValue !== 0) {
+            ctx.fillStyle = darkMode ? '#ffffff' : '#000000';
+            const fontSize = Math.max(6, exportCellSize * 0.7); // Scale font with cell size
+            ctx.font = `${fontSize}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(
+              cellValue.toString(),
+              x + exportCellSize / 2,
+              y + exportCellSize / 2
+            );
+          }
+        }
+      }
+    }
+    
+    // Convert to blob and download
+    exportCanvas.toBlob((blob) => {
+      if (!blob) {
+        alert('Failed to generate PNG');
+        return;
+      }
       
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `cellular-automaton-${new Date().toISOString().slice(0, 10)}.png`;
+      link.download = `cellular-automaton-rule${rule}-${latticeWidth}x${lightconeLength}-${mode}-${displayMode}-${new Date().toISOString().slice(0, 10)}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-    });
+    }, 'image/png');
   };
 
   const saveRegex = () => {
