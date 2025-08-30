@@ -99,6 +99,17 @@ function App() {
   const [binaryColorsExpanded, setBinaryColorsExpanded] = useState(false);
   const [aliveColor, setAliveColor] = useState('#000000');
   const [deadColor, setDeadColor] = useState('#ffffff');
+  const [stateColorsExpanded, setStateColorsExpanded] = useState(false);
+  const [stateColors, setStateColors] = useState([
+    '#ffffff',  // 0 - white
+    '#ff0000',  // 1 - red
+    '#00ff00',  // 2 - green
+    '#0000ff',  // 3 - blue
+    '#ffff00',  // 4 - yellow
+    '#ff00ff',  // 5 - magenta
+    '#00ffff',  // 6 - cyan
+    '#000000',  // 7 - black
+  ]);
   
   // Zoom and pan state
   const [zoom, setZoom] = useState(1);
@@ -151,6 +162,16 @@ function App() {
 
   const toggleBinaryColors = () => {
     setBinaryColorsExpanded(!binaryColorsExpanded);
+  };
+
+  const toggleStateColors = () => {
+    setStateColorsExpanded(!stateColorsExpanded);
+  };
+
+  const updateStateColor = (index: number, color: string) => {
+    const newStateColors = [...stateColors];
+    newStateColors[index] = color;
+    setStateColors(newStateColors);
   };
 
   const saveRegex = () => {
@@ -325,18 +346,43 @@ function App() {
                       </Grid>
 
                       <Grid size={{ xs: 12 }}>
-                        <FormControl fullWidth size="small">
-                          <InputLabel>State Colors</InputLabel>
-                          <Select
-                            value="default"
-                            label="State Colors"
-                            disabled
-                          >
-                            <MenuItem value="default">Rainbow</MenuItem>
-                            <MenuItem value="monochrome">Monochrome</MenuItem>
-                            <MenuItem value="pastel">Pastel</MenuItem>
-                          </Select>
-                        </FormControl>
+                        <ListItemButton onClick={toggleStateColors} sx={{ pl: 0, pr: 0 }}>
+                          <ListItemText 
+                            primary="State Colors"
+                            secondary={!stateColorsExpanded ? `8 colors configured` : undefined}
+                          />
+                          {stateColorsExpanded ? <ExpandLess /> : <ExpandMore />}
+                        </ListItemButton>
+                        <Collapse in={stateColorsExpanded} timeout="auto" unmountOnExit>
+                          <Box sx={{ pl: 2, pr: 2, pb: 2 }}>
+                            <Grid container spacing={2}>
+                              {stateColors.map((color, index) => (
+                                <Grid size={{ xs: 6 }} key={index}>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Typography variant="body2" sx={{ minWidth: '20px' }}>
+                                      {index}:
+                                    </Typography>
+                                    <input
+                                      type="color"
+                                      value={color}
+                                      onChange={(e) => updateStateColor(index, e.target.value)}
+                                      style={{
+                                        width: '40px',
+                                        height: '30px',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer'
+                                      }}
+                                    />
+                                    <Typography variant="caption" sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}>
+                                      {color}
+                                    </Typography>
+                                  </Box>
+                                </Grid>
+                              ))}
+                            </Grid>
+                          </Box>
+                        </Collapse>
                       </Grid>
 
                       <Grid size={{ xs: 12 }}>
@@ -500,6 +546,7 @@ function App() {
             darkMode={darkMode}
             aliveColor={aliveColor}
             deadColor={deadColor}
+            stateColors={stateColors}
             className="main-grid"
           />
         </Box>
