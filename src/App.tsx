@@ -180,6 +180,48 @@ function App() {
     setStateColors(newStateColors);
   };
 
+  const resetToDefaults = () => {
+    // Reset all parameters to default values
+    setLatticeWidth(101);
+    setLightconeLength(50);
+    setRule(30);
+    setMode('binary');
+    setDisplayMode('colors');
+    setDarkMode(false);
+    
+    // Reset binary colors to defaults
+    setAliveColor('#000000');
+    setDeadColor('#ffffff');
+    
+    // Reset state colors to defaults
+    setStateColors([
+      '#ffffff',  // 0 - white
+      '#ff0000',  // 1 - red
+      '#00ff00',  // 2 - green
+      '#0000ff',  // 3 - blue
+      '#ffff00',  // 4 - yellow
+      '#ff00ff',  // 5 - magenta
+      '#00ffff',  // 6 - cyan
+      '#000000',  // 7 - black
+    ]);
+    
+    // Reset zoom and pan
+    setZoom(1);
+    setPanX(0);
+    setPanY(0);
+    
+    // Reset expanded states
+    setBinaryColorsExpanded(false);
+    setStateColorsExpanded(false);
+    setParametersExpanded(true);
+    setGeneralExpanded(false);
+    setRegexExpanded(false);
+    
+    // Clear saved regexes
+    setSavedRegexes([]);
+    setCurrentRegex('');
+  };
+
   const saveRegex = () => {
     if (currentRegex.trim() && !savedRegexes.includes(currentRegex.trim())) {
       setSavedRegexes([...savedRegexes, currentRegex.trim()]);
@@ -422,14 +464,15 @@ function App() {
                       )}
 
                       <Grid size={{ xs: 12 }}>
-                        <TextField
-                          label="Export"
-                          value="PNG Image"
+                        <Button
+                          variant="outlined"
+                          color="warning"
                           fullWidth
-                          size="small"
-                          disabled
-                          helperText="Export functionality coming soon"
-                        />
+                          onClick={resetToDefaults}
+                          sx={{ mt: 2 }}
+                        >
+                          Reset to Defaults
+                        </Button>
                       </Grid>
                     </Grid>
                   </Paper>
