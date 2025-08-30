@@ -95,7 +95,7 @@ function App() {
   const [regexExpanded, setRegexExpanded] = useState(false);
   const [currentRegex, setCurrentRegex] = useState('');
   const [savedRegexes, setSavedRegexes] = useState<string[]>([]);
-  const [nightMode, setNightMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
   
   // Zoom and pan state
   const [zoom, setZoom] = useState(1);
@@ -157,39 +157,39 @@ function App() {
     setSavedRegexes(savedRegexes.filter(regex => regex !== regexToRemove));
   };
 
-  // Create dynamic theme based on night mode
+  // Create dynamic theme based on dark mode
   const dynamicTheme = useMemo(() => createTheme({
     palette: {
-      mode: nightMode ? 'dark' : 'light',
+      mode: darkMode ? 'dark' : 'light',
       background: {
-        default: nightMode ? '#000000' : '#ffffff',
-        paper: nightMode ? '#121212' : '#ffffff',
+        default: darkMode ? '#000000' : '#ffffff',
+        paper: darkMode ? '#121212' : '#ffffff',
       },
       primary: {
-        main: nightMode ? '#90caf9' : '#1976d2',
+        main: darkMode ? '#90caf9' : '#1976d2',
       },
       text: {
-        primary: nightMode ? '#ffffff' : '#000000',
-        secondary: nightMode ? '#b0b0b0' : '#666666',
+        primary: darkMode ? '#ffffff' : '#000000',
+        secondary: darkMode ? '#b0b0b0' : '#666666',
       },
     },
     components: {
       MuiAppBar: {
         styleOverrides: {
           root: {
-            backgroundColor: nightMode ? '#000000' : '#1976d2',
+            backgroundColor: darkMode ? '#000000' : '#1976d2',
           },
         },
       },
       MuiDrawer: {
         styleOverrides: {
           paper: {
-            backgroundColor: nightMode ? '#121212' : '#ffffff',
+            backgroundColor: darkMode ? '#121212' : '#ffffff',
           },
         },
       },
     },
-  }), [nightMode]);
+  }), [darkMode]);
 
   return (
     <ThemeProvider theme={dynamicTheme}>
@@ -252,12 +252,12 @@ function App() {
                         <FormControlLabel
                           control={
                             <Switch
-                              checked={nightMode}
-                              onChange={(e) => setNightMode(e.target.checked)}
-                              name="nightMode"
+                              checked={darkMode}
+                              onChange={(e) => setDarkMode(e.target.checked)}
+                              name="darkMode"
                             />
                           }
-                          label="Night Mode"
+                          label="Dark Mode"
                         />
                       </Grid>
                       
@@ -449,7 +449,7 @@ function App() {
             onPan={(x, y) => { setPanX(x); setPanY(y); }}
             data={data}
             mode={mode}
-            nightMode={nightMode}
+            darkMode={darkMode}
             className="main-grid"
           />
         </Box>

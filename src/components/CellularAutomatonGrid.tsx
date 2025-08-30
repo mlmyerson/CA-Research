@@ -20,8 +20,8 @@ interface CellularAutomatonGridProps {
   data: number[][];
   /** Display mode: 'binary' for 0/1 values, 'state' for 0-7 rule states */
   mode: 'binary' | 'state';
-  /** Night mode for dark theme */
-  nightMode: boolean;
+  /** Dark mode for dark theme */
+  darkMode: boolean;
   /** Optional CSS class name */
   className?: string;
 }
@@ -36,7 +36,7 @@ const CellularAutomatonGrid = ({
   onPan,
   data,
   mode,
-  nightMode,
+  darkMode,
   className = ''
 }: CellularAutomatonGridProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -83,8 +83,8 @@ const CellularAutomatonGrid = ({
     canvas.width = rect.width;
     canvas.height = rect.height;
 
-    // Clear canvas with proper night mode background
-    ctx.fillStyle = nightMode ? '#000000' : '#ffffff';
+    // Clear canvas with proper dark mode background
+    ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Calculate scaled dimensions
@@ -128,7 +128,7 @@ const CellularAutomatonGrid = ({
         }
       }
     }
-  }, [data, latticeWidth, lightconeLength, zoom, panX, panY, mode, nightMode, baseCellSize, getCellColor, onPan]);
+  }, [data, latticeWidth, lightconeLength, zoom, panX, panY, mode, darkMode, baseCellSize, getCellColor, onPan]);
 
   // Redraw when data or view parameters change
   useEffect(() => {
@@ -226,7 +226,7 @@ const CellularAutomatonGrid = ({
       sx={{
         borderRadius: 2,
         overflow: 'hidden',
-        border: '1px solid #e0e0e0'
+        border: '1px solid #d0e0e0'
       }}
     >
       <Box
