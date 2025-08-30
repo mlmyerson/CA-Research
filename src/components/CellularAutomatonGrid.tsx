@@ -30,8 +30,8 @@ interface CellularAutomatonGridProps {
   deadColor: string;
   /** Colors for state mode (array of 8 colors for states 0-7) */
   stateColors: string[];
-  /** Saved regex patterns with colors for highlighting */
-  savedRegexes: {pattern: string, color: string}[];
+  /** Saved regex patterns with names and colors for highlighting */
+  savedRegexes: {name: string, pattern: string, color: string}[];
   /** Optional CSS class name */
   className?: string;
 }
