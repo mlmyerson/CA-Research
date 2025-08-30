@@ -22,6 +22,10 @@ interface CellularAutomatonGridProps {
   mode: 'binary' | 'state';
   /** Dark mode for dark theme */
   darkMode: boolean;
+  /** Color for alive cells in binary mode */
+  aliveColor: string;
+  /** Color for dead cells in binary mode */
+  deadColor: string;
   /** Optional CSS class name */
   className?: string;
 }
@@ -37,6 +41,8 @@ const CellularAutomatonGrid = ({
   data,
   mode,
   darkMode,
+  aliveColor,
+  deadColor,
   className = ''
 }: CellularAutomatonGridProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -50,7 +56,7 @@ const CellularAutomatonGrid = ({
   // Get cell color based on mode and value
   const getCellColor = (value: number): string => {
     if (mode === 'binary') {
-      return value === 0 ? '#ffffff' : '#000000';
+      return value === 0 ? deadColor : aliveColor;
     } else {
       // State mode: different colors for each rule (0-7)
       const stateColors = [
@@ -128,7 +134,7 @@ const CellularAutomatonGrid = ({
         }
       }
     }
-  }, [data, latticeWidth, lightconeLength, zoom, panX, panY, mode, darkMode, baseCellSize, getCellColor, onPan]);
+  }, [data, latticeWidth, lightconeLength, zoom, panX, panY, mode, darkMode, aliveColor, deadColor, baseCellSize, getCellColor, onPan]);
 
   // Redraw when data or view parameters change
   useEffect(() => {

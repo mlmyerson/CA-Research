@@ -96,6 +96,9 @@ function App() {
   const [currentRegex, setCurrentRegex] = useState('');
   const [savedRegexes, setSavedRegexes] = useState<string[]>([]);
   const [darkMode, setDarkMode] = useState(false);
+  const [binaryColorsExpanded, setBinaryColorsExpanded] = useState(false);
+  const [aliveColor, setAliveColor] = useState('#000000');
+  const [deadColor, setDeadColor] = useState('#ffffff');
   
   // Zoom and pan state
   const [zoom, setZoom] = useState(1);
@@ -144,6 +147,10 @@ function App() {
 
   const toggleRegex = () => {
     setRegexExpanded(!regexExpanded);
+  };
+
+  const toggleBinaryColors = () => {
+    setBinaryColorsExpanded(!binaryColorsExpanded);
   };
 
   const saveRegex = () => {
@@ -262,18 +269,59 @@ function App() {
                       </Grid>
                       
                       <Grid size={{ xs: 12 }}>
-                        <FormControl fullWidth size="small">
-                          <InputLabel>Binary Colors</InputLabel>
-                          <Select
-                            value="default"
-                            label="Binary Colors"
-                            disabled
-                          >
-                            <MenuItem value="default">Black & White</MenuItem>
-                            <MenuItem value="blue">Blue & White</MenuItem>
-                            <MenuItem value="red">Red & White</MenuItem>
-                          </Select>
-                        </FormControl>
+                        <ListItemButton onClick={toggleBinaryColors} sx={{ pl: 0, pr: 0 }}>
+                          <ListItemText 
+                            primary="Binary Colors"
+                            secondary={!binaryColorsExpanded ? `Alive: ${aliveColor} • Dead: ${deadColor}` : undefined}
+                          />
+                          {binaryColorsExpanded ? <ExpandLess /> : <ExpandMore />}
+                        </ListItemButton>
+                        <Collapse in={binaryColorsExpanded} timeout="auto" unmountOnExit>
+                          <Box sx={{ pl: 2, pr: 2, pb: 2 }}>
+                            <Grid container spacing={2}>
+                              <Grid size={{ xs: 6 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <Typography variant="body2" sx={{ minWidth: '40px' }}>Alive:</Typography>
+                                  <input
+                                    type="color"
+                                    value={aliveColor}
+                                    onChange={(e) => setAliveColor(e.target.value)}
+                                    style={{
+                                      width: '40px',
+                                      height: '30px',
+                                      border: 'none',
+                                      borderRadius: '4px',
+                                      cursor: 'pointer'
+                                    }}
+                                  />
+                                  <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                                    {aliveColor}
+                                  </Typography>
+                                </Box>
+                              </Grid>
+                              <Grid size={{ xs: 6 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <Typography variant="body2" sx={{ minWidth: '40px' }}>Dead:</Typography>
+                                  <input
+                                    type="color"
+                                    value={deadColor}
+                                    onChange={(e) => setDeadColor(e.target.value)}
+                                    style={{
+                                      width: '40px',
+                                      height: '30px',
+                                      border: 'none',
+                                      borderRadius: '4px',
+                                      cursor: 'pointer'
+                                    }}
+                                  />
+                                  <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                                    {deadColor}
+                                  </Typography>
+                                </Box>
+                              </Grid>
+                            </Grid>
+                          </Box>
+                        </Collapse>
                       </Grid>
 
                       <Grid size={{ xs: 12 }}>
@@ -450,6 +498,8 @@ function App() {
             data={data}
             mode={mode}
             darkMode={darkMode}
+            aliveColor={aliveColor}
+            deadColor={deadColor}
             className="main-grid"
           />
         </Box>
