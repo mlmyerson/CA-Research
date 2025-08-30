@@ -164,7 +164,7 @@ const CellularAutomatonGrid = ({
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setIsDragging(true);
-    setDragStart({ x: e.clientX - panX, y: e.clientY - panY });
+    setDragStart({ x: e.clientX + panX, y: e.clientY + panY });
   }, [panX, panY]);
 
   // Handle mouse move for dragging
@@ -175,9 +175,9 @@ const CellularAutomatonGrid = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Calculate new pan values
-    const newPanX = e.clientX - dragStart.x;
-    const newPanY = e.clientY - dragStart.y;
+    // Calculate new pan values (reversed for natural dragging feel)
+    const newPanX = dragStart.x - e.clientX;
+    const newPanY = dragStart.y - e.clientY;
 
     // Calculate scaled dimensions for bounds checking
     const scaledCellSize = baseCellSize * zoom;
