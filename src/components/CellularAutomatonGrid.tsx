@@ -20,6 +20,8 @@ interface CellularAutomatonGridProps {
   data: number[][];
   /** Display mode: 'binary' for 0/1 values, 'state' for 0-7 rule states */
   mode: 'binary' | 'state';
+  /** Display type: 'colors' for colored cells, 'numbers' for text numbers */
+  displayMode: 'colors' | 'numbers';
   /** Dark mode for dark theme */
   darkMode: boolean;
   /** Color for alive cells in binary mode */
@@ -42,6 +44,7 @@ const CellularAutomatonGrid = ({
   onPan,
   data,
   mode,
+  displayMode,
   darkMode,
   aliveColor,
   deadColor,
@@ -114,7 +117,6 @@ const CellularAutomatonGrid = ({
     for (let generation = 0; generation < lightconeLength; generation++) {
       for (let position = 0; position < latticeWidth; position++) {
         const cellValue = data[generation]?.[position] || 0;
-        const color = getCellColor(cellValue);
         
         const x = offsetX + position * scaledCellSize;
         const y = offsetY + generation * scaledCellSize;
@@ -122,12 +124,44 @@ const CellularAutomatonGrid = ({
         // Only draw cells that are visible
         if (x + scaledCellSize >= 0 && x <= canvas.width && 
             y + scaledCellSize >= 0 && y <= canvas.height) {
-          ctx.fillStyle = color;
-          ctx.fillRect(x, y, scaledCellSize, scaledCellSize);
+          
+          if (displayMode === 'colors') {
+            // Color mode: fill with colors
+            const color = getCellColor(cellValue);
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, scaledCellSize, scaledCellSize);
+          } else {
+            // Numbers mode: fill with background and draw text
+            ctx.fillStyle = darkMode ? '#1a1a1a' : '#f5f5f5';
+            ctx.fillRect(x, y, scaledCellSize, scaledCellSize);
+            
+            // Draw border for grid effect
+            ctx.strokeStyle = darkMode ? '#333333' : '#cccccc';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x, y, scaledCellSize, scaledCellSize);
+            
+            // Draw number if cell is large enough and has a value
+            if (scaledCellSize >= 4) { // Very small minimum for debugging
+              ctx.fillStyle = darkMode ? '#ffffff' : '#000000';
+              const fontSize = Math.max(8, Math.min(scaledCellSize * 0.8, 32)); // Larger font
+              ctx.font = `${fontSize}px Arial`;
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              
+              // Only show non-zero values for both binary and state modes
+              if (cellValue !== 0) {
+                ctx.fillText(
+                  cellValue.toString(),
+                  x + scaledCellSize / 2,
+                  y + scaledCellSize / 2
+                );
+              }
+            }
+          }
         }
       }
     }
-  }, [data, latticeWidth, lightconeLength, zoom, panX, panY, mode, darkMode, aliveColor, deadColor, stateColors, baseCellSize, getCellColor, onPan]);
+  }, [data, latticeWidth, lightconeLength, zoom, panX, panY, mode, displayMode, darkMode, aliveColor, deadColor, stateColors, baseCellSize, getCellColor, onPan]);
 
   // Redraw when data or view parameters change
   useEffect(() => {

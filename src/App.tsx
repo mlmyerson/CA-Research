@@ -88,6 +88,7 @@ function App() {
   const [lightconeLength, setLightconeLength] = useState(50);
   const [rule, setRule] = useState(30);
   const [mode, setMode] = useState<'binary' | 'state'>('binary');
+  const [displayMode, setDisplayMode] = useState<'colors' | 'numbers'>('colors');
   const [data, setData] = useState<number[][]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [parametersExpanded, setParametersExpanded] = useState(true);
@@ -137,12 +138,17 @@ function App() {
     const zoomToFitHeight = viewportHeight / imageHeight;
     
     // Use the smaller zoom to ensure the entire image fits
-    const optimalZoom = Math.min(zoomToFitWidth, zoomToFitHeight);
+    let optimalZoom = Math.min(zoomToFitWidth, zoomToFitHeight);
+    
+    // If in numbers mode, ensure zoom is high enough to show text
+    if (displayMode === 'numbers') {
+      optimalZoom = Math.max(optimalZoom, 2); // Minimum zoom of 2 for numbers
+    }
     
     setZoom(Math.max(0.1, optimalZoom)); // Minimum zoom of 0.1
     setPanX(0);
     setPanY(0);
-  }, [latticeWidth, lightconeLength]);
+  }, [latticeWidth, lightconeLength, displayMode]);
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -299,6 +305,19 @@ function App() {
                             />
                           }
                           label={mode === 'binary' ? 'Binary' : 'State'}
+                        />
+                      </Grid>
+                      
+                      <Grid size={{ xs: 12 }}>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={displayMode === 'numbers'}
+                              onChange={(e) => setDisplayMode(e.target.checked ? 'numbers' : 'colors')}
+                              name="displayMode"
+                            />
+                          }
+                          label={displayMode === 'colors' ? 'Colors' : 'Numbers'}
                         />
                       </Grid>
                       
@@ -560,6 +579,7 @@ function App() {
             onPan={(x, y) => { setPanX(x); setPanY(y); }}
             data={data}
             mode={mode}
+            displayMode={displayMode}
             darkMode={darkMode}
             aliveColor={aliveColor}
             deadColor={deadColor}
