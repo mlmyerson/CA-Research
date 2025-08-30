@@ -129,9 +129,9 @@ function App() {
     const imageWidth = latticeWidth * baseCellSize;
     const imageHeight = lightconeLength * baseCellSize;
     
-    // Get viewport dimensions (subtract app bar height)
+    // Get full viewport dimensions
     const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight - 64; // 64px for app bar
+    const viewportHeight = window.innerHeight;
     
     // Calculate zoom to fit both dimensions
     const zoomToFitWidth = viewportWidth / imageWidth;

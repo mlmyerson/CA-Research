@@ -1,4 +1,4 @@
-import { Box, Paper } from '@mui/material';
+import { Box } from '@mui/material';
 import { useState, useRef, useCallback, useEffect } from 'react';
 
 interface CellularAutomatonGridProps {
@@ -253,41 +253,35 @@ const CellularAutomatonGrid = ({
   }, []);
 
   return (
-    <Paper 
-      elevation={4}
+    <Box
+      ref={containerRef}
       className={className}
       sx={{
-        borderRadius: 2,
-        overflow: 'hidden',
-        border: '1px solid #d0e0e0'
+        width: '100vw',
+        height: '100vh',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        cursor: isDragging ? 'grabbing' : 'grab',
+        userSelect: 'none',
+        zIndex: 0
       }}
+      onWheel={handleWheel}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      <Box
-        ref={containerRef}
-        sx={{
+      <canvas
+        ref={canvasRef}
+        style={{
+          display: 'block',
           width: '100%',
-          height: 'calc(100vh - 64px)', // Subtract app bar height
-          position: 'relative',
-          cursor: isDragging ? 'grabbing' : 'grab',
-          userSelect: 'none'
+          height: '100%'
         }}
-        onWheel={handleWheel}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        <canvas
-          ref={canvasRef}
-          style={{
-            display: 'block',
-            width: '100%',
-            height: '100%'
-          }}
-        />
-      </Box>
-    </Paper>
+      />
+    </Box>
   );
 };
 
