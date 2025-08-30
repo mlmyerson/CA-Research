@@ -88,6 +88,7 @@ function App() {
   const [data, setData] = useState<number[][]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [parametersExpanded, setParametersExpanded] = useState(true);
+  const [generalExpanded, setGeneralExpanded] = useState(false);
   
   // Zoom and pan state
   const [zoom, setZoom] = useState(1);
@@ -128,6 +129,10 @@ function App() {
 
   const toggleParameters = () => {
     setParametersExpanded(!parametersExpanded);
+  };
+
+  const toggleGeneral = () => {
+    setGeneralExpanded(!generalExpanded);
   };
 
   return (
@@ -177,6 +182,75 @@ function App() {
             </Box>
             
             <List>
+              <ListItemButton onClick={toggleGeneral}>
+                <ListItemText 
+                  primary="General" 
+                />
+                {generalExpanded ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+              <Collapse in={generalExpanded} timeout="auto" unmountOnExit>
+                <Box sx={{ px: 2, pb: 2 }}>
+                  <Paper elevation={2} sx={{ p: 3 }}>
+                    <Grid container spacing={3}>
+                      <Grid size={{ xs: 12 }}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>Night Mode</InputLabel>
+                          <Select
+                            value="off"
+                            label="Night Mode"
+                            disabled
+                          >
+                            <MenuItem value="off">Off</MenuItem>
+                            <MenuItem value="on">On</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      
+                      <Grid size={{ xs: 12 }}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>Binary Colors</InputLabel>
+                          <Select
+                            value="default"
+                            label="Binary Colors"
+                            disabled
+                          >
+                            <MenuItem value="default">Black & White</MenuItem>
+                            <MenuItem value="blue">Blue & White</MenuItem>
+                            <MenuItem value="red">Red & White</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Grid>
+
+                      <Grid size={{ xs: 12 }}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>State Colors</InputLabel>
+                          <Select
+                            value="default"
+                            label="State Colors"
+                            disabled
+                          >
+                            <MenuItem value="default">Rainbow</MenuItem>
+                            <MenuItem value="monochrome">Monochrome</MenuItem>
+                            <MenuItem value="pastel">Pastel</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Grid>
+
+                      <Grid size={{ xs: 12 }}>
+                        <TextField
+                          label="Export"
+                          value="PNG Image"
+                          fullWidth
+                          size="small"
+                          disabled
+                          helperText="Export functionality coming soon"
+                        />
+                      </Grid>
+                    </Grid>
+                  </Paper>
+                </Box>
+              </Collapse>
+              
               <ListItemButton onClick={toggleParameters}>
                 <ListItemText 
                   primary="Parameters" 
