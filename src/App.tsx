@@ -222,6 +222,100 @@ function App() {
     setCurrentRegex('');
   };
 
+  const exportSettings = () => {
+    const settings = {
+      latticeWidth,
+      lightconeLength,
+      rule,
+      mode,
+      displayMode,
+      darkMode,
+      aliveColor,
+      deadColor,
+      stateColors,
+      savedRegexes,
+      zoom,
+      panX,
+      panY,
+      timestamp: new Date().toISOString()
+    };
+    
+    const dataStr = JSON.stringify(settings, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `cellular-automaton-settings-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const importSettings = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const settings = JSON.parse(e.target?.result as string);
+          
+          // Apply imported settings
+          if (settings.latticeWidth !== undefined) setLatticeWidth(settings.latticeWidth);
+          if (settings.lightconeLength !== undefined) setLightconeLength(settings.lightconeLength);
+          if (settings.rule !== undefined) setRule(settings.rule);
+          if (settings.mode !== undefined) setMode(settings.mode);
+          if (settings.displayMode !== undefined) setDisplayMode(settings.displayMode);
+          if (settings.darkMode !== undefined) setDarkMode(settings.darkMode);
+          if (settings.aliveColor !== undefined) setAliveColor(settings.aliveColor);
+          if (settings.deadColor !== undefined) setDeadColor(settings.deadColor);
+          if (settings.stateColors !== undefined) setStateColors(settings.stateColors);
+          if (settings.savedRegexes !== undefined) setSavedRegexes(settings.savedRegexes);
+          if (settings.zoom !== undefined) setZoom(settings.zoom);
+          if (settings.panX !== undefined) setPanX(settings.panX);
+          if (settings.panY !== undefined) setPanY(settings.panY);
+          
+        } catch (error) {
+          alert('Error importing settings: Invalid JSON file');
+          console.error('Import error:', error);
+        }
+      };
+      reader.readAsText(file);
+    };
+    
+    input.click();
+  };
+
+  const exportPNG = () => {
+    // We'll need to get the canvas from the CellularAutomatonGrid component
+    // For now, we'll create a simple implementation
+    const canvas = document.querySelector('canvas');
+    if (!canvas) {
+      alert('No canvas found to export');
+      return;
+    }
+    
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `cellular-automaton-${new Date().toISOString().slice(0, 10)}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    });
+  };
+
   const saveRegex = () => {
     if (currentRegex.trim() && !savedRegexes.includes(currentRegex.trim())) {
       setSavedRegexes([...savedRegexes, currentRegex.trim()]);
@@ -462,6 +556,44 @@ function App() {
                           </Collapse>
                         </Grid>
                       )}
+
+                      <Grid size={{ xs: 12 }}>
+                        <Grid container spacing={2}>
+                          <Grid size={{ xs: 4 }}>
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              fullWidth
+                              onClick={importSettings}
+                              size="small"
+                            >
+                              Import
+                            </Button>
+                          </Grid>
+                          <Grid size={{ xs: 4 }}>
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              fullWidth
+                              onClick={exportSettings}
+                              size="small"
+                            >
+                              Save
+                            </Button>
+                          </Grid>
+                          <Grid size={{ xs: 4 }}>
+                            <Button
+                              variant="outlined"
+                              color="secondary"
+                              fullWidth
+                              onClick={exportPNG}
+                              size="small"
+                            >
+                              Export
+                            </Button>
+                          </Grid>
+                        </Grid>
+                      </Grid>
 
                       <Grid size={{ xs: 12 }}>
                         <Button
