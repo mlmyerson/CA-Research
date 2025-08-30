@@ -290,82 +290,37 @@ function App() {
                       </Grid>
                       
                       <Grid size={{ xs: 12 }}>
-                        <ListItemButton onClick={toggleBinaryColors} sx={{ pl: 0, pr: 0 }}>
-                          <ListItemText 
-                            primary="Binary Colors"
-                            secondary={!binaryColorsExpanded ? `Alive: ${aliveColor} • Dead: ${deadColor}` : undefined}
-                          />
-                          {binaryColorsExpanded ? <ExpandLess /> : <ExpandMore />}
-                        </ListItemButton>
-                        <Collapse in={binaryColorsExpanded} timeout="auto" unmountOnExit>
-                          <Box sx={{ pl: 2, pr: 2, pb: 2 }}>
-                            <Grid container spacing={2}>
-                              <Grid size={{ xs: 6 }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <Typography variant="body2" sx={{ minWidth: '40px' }}>Alive:</Typography>
-                                  <input
-                                    type="color"
-                                    value={aliveColor}
-                                    onChange={(e) => setAliveColor(e.target.value)}
-                                    style={{
-                                      width: '40px',
-                                      height: '30px',
-                                      border: 'none',
-                                      borderRadius: '4px',
-                                      cursor: 'pointer'
-                                    }}
-                                  />
-                                  <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-                                    {aliveColor}
-                                  </Typography>
-                                </Box>
-                              </Grid>
-                              <Grid size={{ xs: 6 }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <Typography variant="body2" sx={{ minWidth: '40px' }}>Dead:</Typography>
-                                  <input
-                                    type="color"
-                                    value={deadColor}
-                                    onChange={(e) => setDeadColor(e.target.value)}
-                                    style={{
-                                      width: '40px',
-                                      height: '30px',
-                                      border: 'none',
-                                      borderRadius: '4px',
-                                      cursor: 'pointer'
-                                    }}
-                                  />
-                                  <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-                                    {deadColor}
-                                  </Typography>
-                                </Box>
-                              </Grid>
-                            </Grid>
-                          </Box>
-                        </Collapse>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={mode === 'state'}
+                              onChange={(e) => setMode(e.target.checked ? 'state' : 'binary')}
+                              name="colorMode"
+                            />
+                          }
+                          label={mode === 'binary' ? 'Binary' : 'State'}
+                        />
                       </Grid>
-
-                      <Grid size={{ xs: 12 }}>
-                        <ListItemButton onClick={toggleStateColors} sx={{ pl: 0, pr: 0 }}>
-                          <ListItemText 
-                            primary="State Colors"
-                            secondary={!stateColorsExpanded ? `8 colors configured` : undefined}
-                          />
-                          {stateColorsExpanded ? <ExpandLess /> : <ExpandMore />}
-                        </ListItemButton>
-                        <Collapse in={stateColorsExpanded} timeout="auto" unmountOnExit>
-                          <Box sx={{ pl: 2, pr: 2, pb: 2 }}>
-                            <Grid container spacing={2}>
-                              {stateColors.map((color, index) => (
-                                <Grid size={{ xs: 6 }} key={index}>
+                      
+                      {mode === 'binary' && (
+                        <Grid size={{ xs: 12 }}>
+                          <ListItemButton onClick={toggleBinaryColors} sx={{ pl: 0, pr: 0 }}>
+                            <ListItemText 
+                              primary="Binary Colors"
+                              secondary={!binaryColorsExpanded ? `Alive: ${aliveColor} • Dead: ${deadColor}` : undefined}
+                            />
+                            {binaryColorsExpanded ? <ExpandLess /> : <ExpandMore />}
+                          </ListItemButton>
+                          <Collapse in={binaryColorsExpanded} timeout="auto" unmountOnExit>
+                            <Box sx={{ pl: 2, pr: 2, pb: 2 }}>
+                              <Grid container spacing={2}>
+                                <Grid size={{ xs: 6 }}>
                                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Typography variant="body2" sx={{ minWidth: '20px' }}>
-                                      {index}:
-                                    </Typography>
+                                    <Typography variant="body2" sx={{ minWidth: '40px' }}>Alive:</Typography>
                                     <input
                                       type="color"
-                                      value={color}
-                                      onChange={(e) => updateStateColor(index, e.target.value)}
+                                      value={aliveColor}
+                                      onChange={(e) => setAliveColor(e.target.value)}
                                       style={{
                                         width: '40px',
                                         height: '30px',
@@ -374,16 +329,78 @@ function App() {
                                         cursor: 'pointer'
                                       }}
                                     />
-                                    <Typography variant="caption" sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}>
-                                      {color}
+                                    <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                                      {aliveColor}
                                     </Typography>
                                   </Box>
                                 </Grid>
-                              ))}
-                            </Grid>
-                          </Box>
-                        </Collapse>
-                      </Grid>
+                                <Grid size={{ xs: 6 }}>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Typography variant="body2" sx={{ minWidth: '40px' }}>Dead:</Typography>
+                                    <input
+                                      type="color"
+                                      value={deadColor}
+                                      onChange={(e) => setDeadColor(e.target.value)}
+                                      style={{
+                                        width: '40px',
+                                        height: '30px',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer'
+                                      }}
+                                    />
+                                    <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                                      {deadColor}
+                                    </Typography>
+                                  </Box>
+                                </Grid>
+                              </Grid>
+                            </Box>
+                          </Collapse>
+                        </Grid>
+                      )}
+
+                      {mode === 'state' && (
+                        <Grid size={{ xs: 12 }}>
+                          <ListItemButton onClick={toggleStateColors} sx={{ pl: 0, pr: 0 }}>
+                            <ListItemText 
+                              primary="State Colors"
+                              secondary={!stateColorsExpanded ? `8 colors configured` : undefined}
+                            />
+                            {stateColorsExpanded ? <ExpandLess /> : <ExpandMore />}
+                          </ListItemButton>
+                          <Collapse in={stateColorsExpanded} timeout="auto" unmountOnExit>
+                            <Box sx={{ pl: 2, pr: 2, pb: 2 }}>
+                              <Grid container spacing={2}>
+                                {stateColors.map((color, index) => (
+                                  <Grid size={{ xs: 6 }} key={index}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                      <Typography variant="body2" sx={{ minWidth: '20px' }}>
+                                        {index}:
+                                      </Typography>
+                                      <input
+                                        type="color"
+                                        value={color}
+                                        onChange={(e) => updateStateColor(index, e.target.value)}
+                                        style={{
+                                          width: '40px',
+                                          height: '30px',
+                                          border: 'none',
+                                          borderRadius: '4px',
+                                          cursor: 'pointer'
+                                        }}
+                                      />
+                                      <Typography variant="caption" sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}>
+                                        {color}
+                                      </Typography>
+                                    </Box>
+                                  </Grid>
+                                ))}
+                              </Grid>
+                            </Box>
+                          </Collapse>
+                        </Grid>
+                      )}
 
                       <Grid size={{ xs: 12 }}>
                         <TextField
