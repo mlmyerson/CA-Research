@@ -340,7 +340,9 @@ function App() {
       deadColor,
       stateColors,
       savedRegexes,
+      currentRegex,
       currentRegexColor,
+      currentRegexName,
       initialConditions,
       zoom,
       panX,
@@ -395,7 +397,9 @@ function App() {
           if (settings.deadColor !== undefined) setDeadColor(settings.deadColor);
           if (settings.stateColors !== undefined) setStateColors(settings.stateColors);
           if (settings.savedRegexes !== undefined) setSavedRegexes(settings.savedRegexes);
+          if (settings.currentRegex !== undefined) setCurrentRegex(settings.currentRegex);
           if (settings.currentRegexColor !== undefined) setCurrentRegexColor(settings.currentRegexColor);
+          if (settings.currentRegexName !== undefined) setCurrentRegexName(settings.currentRegexName);
           if (settings.initialConditions !== undefined) setInitialConditions(settings.initialConditions);
           if (settings.zoom !== undefined) setZoom(settings.zoom);
           if (settings.panX !== undefined) setPanX(settings.panX);
