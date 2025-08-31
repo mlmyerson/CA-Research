@@ -525,6 +525,18 @@ function App() {
     ));
   };
 
+  const generateRandomInitialConditions = () => {
+    let randomPattern = '';
+    for (let i = 0; i < latticeWidth; i++) {
+      if (mode === 'binary') {
+        randomPattern += Math.random() < 0.5 ? '0' : '1';
+      } else {
+        randomPattern += Math.floor(Math.random() * 8).toString();
+      }
+    }
+    setInitialConditions(randomPattern);
+  };
+
   // Create dynamic theme based on dark mode
   const dynamicTheme = useMemo(() => createTheme({
     palette: {
@@ -885,6 +897,18 @@ function App() {
                             }
                           }}
                         />
+                      </Grid>
+                      
+                      <Grid size={{ xs: 12 }}>
+                        <Button
+                          variant="outlined"
+                          onClick={generateRandomInitialConditions}
+                          fullWidth
+                          size="small"
+                          sx={{ mt: 1 }}
+                        >
+                          Generate Random Initial Conditions
+                        </Button>
                       </Grid>
                     </Grid>
                   </Paper>
