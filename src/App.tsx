@@ -17,13 +17,17 @@ import {
   ListItemText,
   Button,
   Switch,
-  FormControlLabel
+  FormControlLabel,
+  Card,
+  CardContent,
+  CardHeader
 } from '@mui/material';
 import {
   Menu as MenuIcon,
   Close as CloseIcon,
   ExpandLess,
-  ExpandMore
+  ExpandMore,
+  HelpOutline as HelpIcon
 } from '@mui/icons-material';
 import CellularAutomatonGrid from './components/CellularAutomatonGrid';
 import './components/CellularAutomatonGrid.css';
@@ -114,6 +118,7 @@ function App() {
   const [displayMode, setDisplayMode] = useState<'colors' | 'numbers'>('colors');
   const [data, setData] = useState<number[][]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [initialConditions, setInitialConditions] = useState('');
   
   // Temporary input values for debouncing
@@ -255,6 +260,10 @@ function App() {
 
   const toggleRegex = () => {
     setRegexExpanded(!regexExpanded);
+  };
+
+  const toggleHelp = () => {
+    setHelpOpen(!helpOpen);
   };
 
   const toggleBinaryColors = () => {
@@ -587,9 +596,17 @@ function App() {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" noWrap component="div">
+            <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
               Elementary Cellular Automaton
             </Typography>
+            <IconButton
+              color="inherit"
+              aria-label="help"
+              onClick={toggleHelp}
+              edge="end"
+            >
+              <HelpIcon />
+            </IconButton>
           </Toolbar>
         </AppBar>
 
@@ -1087,6 +1104,187 @@ function App() {
             className="main-grid"
           />
         </Box>
+
+        {/* Help Panel */}
+        {helpOpen && (
+          <Card
+            sx={{
+              position: 'fixed',
+              top: 64, // Below the toolbar
+              right: 16,
+              width: 400,
+              maxHeight: 'calc(100vh - 80px)',
+              zIndex: (theme) => theme.zIndex.drawer + 2,
+              boxShadow: 3,
+              backgroundColor: darkMode ? '#1e1e1e' : '#ffffff',
+            }}
+          >
+            <CardHeader
+              title="Help & Documentation"
+              action={
+                <IconButton onClick={toggleHelp} size="small">
+                  <CloseIcon />
+                </IconButton>
+              }
+              sx={{
+                backgroundColor: darkMode ? '#333' : '#f5f5f5',
+                '& .MuiCardHeader-title': {
+                  fontSize: '1.1rem',
+                  fontWeight: 'bold'
+                }
+              }}
+            />
+            <CardContent
+              sx={{
+                maxHeight: 'calc(100vh - 150px)',
+                overflow: 'auto',
+                p: 3,
+                '&::-webkit-scrollbar': {
+                  width: '8px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  backgroundColor: darkMode ? '#333' : '#f1f1f1',
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  backgroundColor: darkMode ? '#666' : '#888',
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb:hover': {
+                  backgroundColor: darkMode ? '#777' : '#555',
+                },
+              }}
+            >
+              {/* Application Overview Section */}
+              <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+                📱 Application Overview
+              </Typography>
+              
+              <Typography variant="body2" paragraph>
+                This is an <strong>Elementary Cellular Automaton</strong> visualization tool for research and exploration. 
+                Cellular automata are discrete mathematical models that show how simple rules can create complex patterns.
+              </Typography>
+
+              <Typography variant="h6" gutterBottom sx={{ mt: 3, fontWeight: 'bold' }}>
+                🚀 Getting Started
+              </Typography>
+              
+              <Typography variant="body2" paragraph>
+                <strong>1. Basic Controls:</strong><br />
+                • Click the <strong>menu icon (☰)</strong> to open the controls panel<br />
+                • Adjust <strong>Rule</strong> (0-255) to change the cellular automaton behavior<br />
+                • Set <strong>Lattice Width</strong> and <strong>Generations</strong> for grid size<br />
+                • <strong>zoom</strong> and <strong>pan</strong> across the image to see fine details.
+              </Typography>
+
+              <Typography variant="body2" paragraph>
+                <strong>2. Display Modes:</strong><br />
+                • <strong>Binary Mode:</strong> Classic black/white cellular automata<br />
+                • <strong>State Mode:</strong> Shows which rule patterns were applied (8 colors)<br />
+                • <strong>Colors vs Numbers:</strong> Toggle between visual and numeric display
+              </Typography>
+
+              <Typography variant="body2" paragraph>
+                <strong>3. Initial Conditions:</strong><br />
+                • Leave empty for single center cell (classic)<br />
+                • Enter custom patterns (e.g., "10110101")<br />
+                • Click <strong>"Generate Random"</strong> for random starting conditions
+              </Typography>
+
+              <Typography variant="body2" paragraph>
+                <strong>4. Colors & Themes:</strong><br />
+                • Toggle <strong>Dark Mode</strong> for comfortable viewing<br />
+                • Customize cell colors in the General section<br />
+                • Save/load settings and export high-quality images
+              </Typography>
+
+              <Typography variant="h6" gutterBottom sx={{ mt: 4, color: 'secondary.main', fontWeight: 'bold' }}>
+                🔍 Regex Pattern Matching
+              </Typography>
+              
+              <Typography variant="body2" paragraph>
+                The <strong>Regex</strong> section lets you find and highlight patterns in the cellular automaton evolution.
+                When a pattern matches, cells are colored with your chosen highlight color.
+              </Typography>
+
+              <Typography variant="body2" paragraph>
+                <strong>How to use:</strong><br />
+                • Enter a descriptive name for your pattern<br />
+                • Write a regular expression pattern<br />
+                • Choose a highlight color<br />
+                • Click Save to apply the pattern
+              </Typography>
+
+              <Typography variant="h6" gutterBottom sx={{ mt: 3, fontWeight: 'bold' }}>
+                📝 Regex Pattern Examples
+              </Typography>
+              
+              <Typography variant="body2" paragraph>
+                <strong>Basic Patterns:</strong>
+              </Typography>
+              
+              <Box sx={{ fontFamily: 'monospace', fontSize: '0.85rem', backgroundColor: darkMode ? '#333' : '#f8f8f8', p: 2, borderRadius: 1, mb: 2 }}>
+                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                  <strong>111</strong> - Find three consecutive 1s<br />
+                  <strong>101</strong> - Find alternating pattern 1-0-1<br />
+                  <strong>000</strong> - Find three consecutive 0s<br />
+                  <strong>1010</strong> - Find repeating 1-0 pattern
+                </Typography>
+              </Box>
+
+              <Typography variant="body2" paragraph>
+                <strong>Advanced Patterns:</strong>
+              </Typography>
+              
+              <Box sx={{ fontFamily: 'monospace', fontSize: '0.85rem', backgroundColor: darkMode ? '#333' : '#f8f8f8', p: 2, borderRadius: 1, mb: 2 }}>
+                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                  <strong>1+</strong> - One or more consecutive 1s<br />
+                  <strong>0&#123;3,5&#125;</strong> - Between 3 and 5 consecutive 0s<br />
+                  <strong>(10)+</strong> - Repeating "10" pattern<br />
+                  <strong>1.*1</strong> - Any pattern starting and ending with 1<br />
+                  <strong>^1</strong> - Line starts with 1<br />
+                  <strong>1$</strong> - Line ends with 1
+                </Typography>
+              </Box>
+
+              <Typography variant="body2" paragraph>
+                <strong>State Mode Patterns (0-7):</strong>
+              </Typography>
+              
+              <Box sx={{ fontFamily: 'monospace', fontSize: '0.85rem', backgroundColor: darkMode ? '#333' : '#f8f8f8', p: 2, borderRadius: 1, mb: 2 }}>
+                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                  <strong>[1-3]+</strong> - Consecutive states 1, 2, or 3<br />
+                  <strong>123</strong> - Exact sequence 1-2-3<br />
+                  <strong>[0-9]</strong> - Any single digit<br />
+                  <strong>7&#123;2,&#125;</strong> - Two or more consecutive 7s
+                </Typography>
+              </Box>
+
+              <Typography variant="h6" gutterBottom sx={{ mt: 3, fontWeight: 'bold' }}>
+                ⚡ Special Characters
+              </Typography>
+              
+              <Box sx={{ fontFamily: 'monospace', fontSize: '0.85rem', backgroundColor: darkMode ? '#333' : '#f8f8f8', p: 2, borderRadius: 1, mb: 2 }}>
+                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                  <strong>.</strong> - Any single character<br />
+                  <strong>*</strong> - Zero or more of previous<br />
+                  <strong>+</strong> - One or more of previous<br />
+                  <strong>?</strong> - Zero or one of previous<br />
+                  <strong>^</strong> - Start of line<br />
+                  <strong>$</strong> - End of line<br />
+                  <strong>[]</strong> - Character class<br />
+                  <strong>()</strong> - Grouping<br />
+                  <strong>|</strong> - OR operator
+                </Typography>
+              </Box>
+
+              <Typography variant="body2" paragraph sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+                💡 <strong>Tip:</strong> Start with simple patterns like "111" or "000" and gradually try more complex expressions. 
+                The highlight colors will help you visualize where patterns occur in the cellular automaton evolution!
+              </Typography>
+            </CardContent>
+          </Card>
+        )}
       </Box>
     </ThemeProvider>
   );
