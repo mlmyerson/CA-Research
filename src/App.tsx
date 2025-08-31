@@ -46,7 +46,8 @@ const generateCellularAutomaton = (
   width: number, 
   generations: number, 
   rule: number = 30,
-  mode: 'binary' | 'state' = 'binary'
+  mode: 'binary' | 'state' = 'binary',
+  initialConditions: string = ''
 ): number[][] => {
   // Validate inputs to prevent crashes
   if (width < 3 || generations < 1 || rule < 0 || rule > 255) {
@@ -56,9 +57,30 @@ const generateCellularAutomaton = (
   
   const data: number[][] = [];
   
-  // Initialize first generation with single center cell
+  // Initialize first generation
   const firstGeneration = new Array(width).fill(0);
-  firstGeneration[Math.floor(width / 2)] = 1;
+  
+  if (initialConditions.trim()) {
+    // Parse initial conditions string
+    const initString = initialConditions.trim();
+    const centerOffset = Math.floor((width - initString.length) / 2);
+    
+    for (let i = 0; i < initString.length && i + centerOffset < width; i++) {
+      const char = initString[i];
+      const cellValue = parseInt(char) || 0;
+      
+      // Validate cell value based on mode
+      if (mode === 'binary' && (cellValue === 0 || cellValue === 1)) {
+        firstGeneration[centerOffset + i] = cellValue;
+      } else if (mode === 'state' && cellValue >= 0 && cellValue <= 7) {
+        firstGeneration[centerOffset + i] = cellValue;
+      }
+    }
+  } else {
+    // Default: single center cell
+    firstGeneration[Math.floor(width / 2)] = 1;
+  }
+  
   data.push(firstGeneration);
   
   // Generate subsequent generations
@@ -92,6 +114,7 @@ function App() {
   const [displayMode, setDisplayMode] = useState<'colors' | 'numbers'>('colors');
   const [data, setData] = useState<number[][]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [initialConditions, setInitialConditions] = useState('');
   
   // Temporary input values for debouncing
   const [latticeWidthInput, setLatticeWidthInput] = useState('101');
@@ -127,9 +150,9 @@ function App() {
 
   // Generate data when parameters change
   useEffect(() => {
-    const newData = generateCellularAutomaton(latticeWidth, lightconeLength, rule, mode);
+    const newData = generateCellularAutomaton(latticeWidth, lightconeLength, rule, mode, initialConditions);
     setData(newData);
-  }, [latticeWidth, lightconeLength, rule, mode]);
+  }, [latticeWidth, lightconeLength, rule, mode, initialConditions]);
 
   // Debounced validation for lattice width
   useEffect(() => {
@@ -259,6 +282,7 @@ function App() {
     setMode('binary');
     setDisplayMode('colors');
     setDarkMode(false);
+    setInitialConditions('');
     
     // Reset binary colors to defaults
     setAliveColor('#000000');
@@ -308,6 +332,7 @@ function App() {
       stateColors,
       savedRegexes,
       currentRegexColor,
+      initialConditions,
       zoom,
       panX,
       panY,
@@ -362,6 +387,7 @@ function App() {
           if (settings.stateColors !== undefined) setStateColors(settings.stateColors);
           if (settings.savedRegexes !== undefined) setSavedRegexes(settings.savedRegexes);
           if (settings.currentRegexColor !== undefined) setCurrentRegexColor(settings.currentRegexColor);
+          if (settings.initialConditions !== undefined) setInitialConditions(settings.initialConditions);
           if (settings.zoom !== undefined) setZoom(settings.zoom);
           if (settings.panX !== undefined) setPanX(settings.panX);
           if (settings.panY !== undefined) setPanY(settings.panY);
@@ -786,7 +812,7 @@ function App() {
               <ListItemButton onClick={toggleParameters}>
                 <ListItemText 
                   primary="Parameters" 
-                  secondary={!parametersExpanded ? `Rule ${rule} • ${latticeWidth}×${lightconeLength} • ${mode}` : undefined}
+                  secondary={!parametersExpanded ? `Rule ${rule} • ${latticeWidth}×${lightconeLength} • ${mode}${initialConditions ? ' • Custom Init' : ''}` : undefined}
                 />
                 {parametersExpanded ? <ExpandLess /> : <ExpandMore />}
               </ListItemButton>
@@ -833,6 +859,31 @@ function App() {
                           inputProps={{ min: 0, max: 255 }}
                           fullWidth
                           size="small"
+                        />
+                      </Grid>
+                      
+                      <Grid size={{ xs: 12 }}>
+                        <TextField
+                          label="Initial Conditions"
+                          value={initialConditions}
+                          onChange={(e) => setInitialConditions(e.target.value)}
+                          fullWidth
+                          size="small"
+                          placeholder={mode === 'binary' ? "e.g., 10110101" : "e.g., 12034567"}
+                          helperText={mode === 'binary' 
+                            ? "Enter 0s and 1s for initial pattern (empty = single center cell)" 
+                            : "Enter digits 0-7 for initial pattern (empty = single center cell)"
+                          }
+                          inputProps={{ 
+                            fontFamily: 'monospace',
+                            pattern: mode === 'binary' ? '[01]*' : '[0-7]*'
+                          }}
+                          sx={{
+                            '& input': {
+                              fontFamily: 'monospace',
+                              fontSize: '0.9rem'
+                            }
+                          }}
                         />
                       </Grid>
                     </Grid>
