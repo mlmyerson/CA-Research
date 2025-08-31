@@ -58,6 +58,8 @@ const CellularAutomatonGrid = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [lastTouchDistance, setLastTouchDistance] = useState(0);
+  const [touchStartZoom, setTouchStartZoom] = useState(1);
   
   // Base cell size for the source image
   const baseCellSize = 4;
@@ -311,6 +313,96 @@ const CellularAutomatonGrid = ({
     setIsDragging(false);
   }, []);
 
+  // Helper function to get touch distance for pinch zoom
+  const getTouchDistance = (touches: React.TouchList) => {
+    if (touches.length < 2) return 0;
+    const touch1 = touches[0];
+    const touch2 = touches[1];
+    return Math.sqrt(
+      Math.pow(touch2.clientX - touch1.clientX, 2) + 
+      Math.pow(touch2.clientY - touch1.clientY, 2)
+    );
+  };
+
+  // Handle touch start
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
+    
+    if (e.touches.length === 1) {
+      // Single finger - start panning
+      setIsDragging(true);
+      const touch = e.touches[0];
+      setDragStart({ x: touch.clientX + panX, y: touch.clientY + panY });
+    } else if (e.touches.length === 2) {
+      // Two fingers - start pinch zoom
+      setIsDragging(false);
+      const distance = getTouchDistance(e.touches);
+      setLastTouchDistance(distance);
+      setTouchStartZoom(zoom);
+    }
+  }, [panX, panY, zoom]);
+
+  // Handle touch move
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
+    
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    if (e.touches.length === 1 && isDragging) {
+      // Single finger - panning
+      const touch = e.touches[0];
+      const newPanX = dragStart.x - touch.clientX;
+      const newPanY = dragStart.y - touch.clientY;
+
+      // Calculate scaled dimensions for bounds checking
+      const scaledCellSize = baseCellSize * zoom;
+      const scaledWidth = latticeWidth * scaledCellSize;
+      const scaledHeight = lightconeLength * scaledCellSize;
+
+      // Calculate bounds
+      const maxPanX = Math.max(0, scaledWidth - canvas.width);
+      const maxPanY = Math.max(0, scaledHeight - canvas.height);
+      const minPanX = Math.min(0, canvas.width - scaledWidth);
+      const minPanY = Math.min(0, canvas.height - scaledHeight);
+
+      // Constrain pan to bounds
+      const constrainedPanX = Math.max(minPanX, Math.min(maxPanX, newPanX));
+      const constrainedPanY = Math.max(minPanY, Math.min(maxPanY, newPanY));
+
+      onPan(constrainedPanX, constrainedPanY);
+    } else if (e.touches.length === 2) {
+      // Two fingers - pinch zoom
+      const distance = getTouchDistance(e.touches);
+      
+      if (lastTouchDistance > 0) {
+        const scaleChange = distance / lastTouchDistance;
+        const newZoom = Math.max(0.25, Math.min(8, touchStartZoom * scaleChange));
+        
+        if (newZoom !== zoom) {
+          onZoom(newZoom);
+        }
+      }
+    }
+  }, [isDragging, dragStart, zoom, touchStartZoom, lastTouchDistance, latticeWidth, lightconeLength, baseCellSize, onPan, onZoom]);
+
+  // Handle touch end
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
+    
+    if (e.touches.length === 0) {
+      // All fingers lifted
+      setIsDragging(false);
+      setLastTouchDistance(0);
+    } else if (e.touches.length === 1) {
+      // One finger remaining - switch back to panning mode
+      setIsDragging(true);
+      const touch = e.touches[0];
+      setDragStart({ x: touch.clientX + panX, y: touch.clientY + panY });
+      setLastTouchDistance(0);
+    }
+  }, [panX, panY]);
+
   return (
     <Box
       ref={containerRef}
@@ -323,7 +415,8 @@ const CellularAutomatonGrid = ({
         left: 0,
         cursor: isDragging ? 'grabbing' : 'grab',
         userSelect: 'none',
-        zIndex: 0
+        zIndex: 0,
+        touchAction: 'none' // Prevent default touch behaviors like scroll/zoom
       }}
       onWheel={handleWheel}
       onMouseDown={handleMouseDown}
@@ -331,6 +424,9 @@ const CellularAutomatonGrid = ({
       onMouseUp={handleMouseUp}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       <canvas
         ref={canvasRef}
