@@ -50,7 +50,8 @@ const generateCellularAutomaton = (
   generations: number, 
   rule: number = 30,
   mode: 'binary' | 'state' = 'binary',
-  initialConditions: string = ''
+  initialConditions: string = '',
+  toroidal: boolean = true
 ): number[][] => {
   // Validate inputs to prevent crashes
   if (width < 3 || generations < 1 || rule < 0 || rule > 255) {
@@ -92,9 +93,16 @@ const generateCellularAutomaton = (
     const prevGeneration = data[gen - 1];
     
     for (let i = 0; i < width; i++) {
-      const left = prevGeneration[(i - 1 + width) % width];
-      const center = prevGeneration[i];
-      const right = prevGeneration[(i + 1) % width];
+      let left: number, center: number, right: number;
+      if (toroidal) {
+        left = prevGeneration[(i - 1 + width) % width];
+        center = prevGeneration[i];
+        right = prevGeneration[(i + 1) % width];
+      } else {
+        left = i === 0 ? 0 : prevGeneration[i - 1];
+        center = prevGeneration[i];
+        right = i === width - 1 ? 0 : prevGeneration[i + 1];
+      }
       
       if (mode === 'binary') {
         newGeneration[i] = applyRule(left, center, right, rule);
@@ -119,6 +127,7 @@ function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [initialConditions, setInitialConditions] = useState('');
+  const [toroidal, setToroidal] = useState(true);
   
   // Temporary input values for debouncing
   const [latticeWidthInput, setLatticeWidthInput] = useState('101');
@@ -154,9 +163,9 @@ function App() {
 
   // Generate data when parameters change
   useEffect(() => {
-    const newData = generateCellularAutomaton(latticeWidth, lightconeLength, rule, mode, initialConditions);
+    const newData = generateCellularAutomaton(latticeWidth, lightconeLength, rule, mode, initialConditions, toroidal);
     setData(newData);
-  }, [latticeWidth, lightconeLength, rule, mode, initialConditions]);
+  }, [latticeWidth, lightconeLength, rule, mode, initialConditions, toroidal]);
 
   // Debounced validation for lattice width
   useEffect(() => {
@@ -346,6 +355,14 @@ function App() {
       zoom,
       panX,
       panY,
+      toroidal,
+      ui: {
+        parametersExpanded,
+        generalExpanded,
+        regexExpanded,
+        binaryColorsExpanded,
+        stateColorsExpanded,
+      },
       timestamp: new Date().toISOString()
     };
     
@@ -403,6 +420,14 @@ function App() {
           if (settings.zoom !== undefined) setZoom(settings.zoom);
           if (settings.panX !== undefined) setPanX(settings.panX);
           if (settings.panY !== undefined) setPanY(settings.panY);
+          if (settings.toroidal !== undefined) setToroidal(settings.toroidal);
+          if (settings.ui) {
+            if (settings.ui.parametersExpanded !== undefined) setParametersExpanded(settings.ui.parametersExpanded);
+            if (settings.ui.generalExpanded !== undefined) setGeneralExpanded(settings.ui.generalExpanded);
+            if (settings.ui.regexExpanded !== undefined) setRegexExpanded(settings.ui.regexExpanded);
+            if (settings.ui.binaryColorsExpanded !== undefined) setBinaryColorsExpanded(settings.ui.binaryColorsExpanded);
+            if (settings.ui.stateColorsExpanded !== undefined) setStateColorsExpanded(settings.ui.stateColorsExpanded);
+          }
           
         } catch (error) {
           alert('Error importing settings: Invalid JSON file');
@@ -844,7 +869,7 @@ function App() {
               <ListItemButton onClick={toggleParameters}>
                 <ListItemText 
                   primary="Parameters" 
-                  secondary={!parametersExpanded ? `Rule ${rule} • ${latticeWidth}×${lightconeLength} • ${mode}${initialConditions ? ' • Custom Init' : ''}` : undefined}
+                  secondary={!parametersExpanded ? `Rule ${rule} • ${latticeWidth}×${lightconeLength} • ${mode}${toroidal ? ' • torus' : ''}${initialConditions ? ' • Custom Init' : ''}` : undefined}
                 />
                 {parametersExpanded ? <ExpandLess /> : <ExpandMore />}
               </ListItemButton>
@@ -852,6 +877,12 @@ function App() {
                 <Box sx={{ px: 2, pb: 2 }}>
                   <Paper elevation={2} sx={{ p: 3 }}>
                     <Grid container spacing={3}>
+                      <Grid size={{ xs: 12 }}>
+                        <FormControlLabel 
+                          control={<Switch checked={toroidal} onChange={(e) => setToroidal(e.target.checked)} size="small" />}
+                          label={toroidal ? 'Toroidal (wrap edges)' : 'Non-toroidal (fixed edges)'}
+                        />
+                      </Grid>
                       <Grid size={{ xs: 12 }}>
                         <TextField
                           label="Lattice Width"
