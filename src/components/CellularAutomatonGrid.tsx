@@ -65,17 +65,17 @@ const CellularAutomatonGrid = ({
   const baseCellSize = 4;
   
   // Get cell color based on mode and value
-  const getCellColor = (value: number): string => {
+  const getCellColor = useCallback((value: number): string => {
     if (mode === 'binary') {
       return value === 0 ? deadColor : aliveColor;
     } else {
       // State mode: use custom colors from stateColors array
       return stateColors[value] || stateColors[0] || '#ffffff';
     }
-  };
+  }, [mode, deadColor, aliveColor, stateColors]);
 
   // Check if a generation matches any regex pattern
-  const getRegexMatches = (generation: number[]): {pattern: string, color: string, matches: number[][]}[] => {
+  const getRegexMatches = useCallback((generation: number[]): {pattern: string, color: string, matches: number[][]}[] => {
     const generationString = generation.join('');
     const results: {pattern: string, color: string, matches: number[][]}[] = [];
     
@@ -106,10 +106,10 @@ const CellularAutomatonGrid = ({
     });
     
     return results;
-  };
+  }, [savedRegexes]);
 
   // Get regex color for a specific cell position, returns null if no match
-  const getRegexColorForPosition = (generation: number[], position: number): string | null => {
+  const getRegexColorForPosition = useCallback((generation: number[], position: number): string | null => {
     const regexMatches = getRegexMatches(generation);
     
     // Check if this position is covered by any regex match
@@ -124,7 +124,7 @@ const CellularAutomatonGrid = ({
     }
     
     return null;
-  };
+  }, [getRegexMatches]);
 
   // Draw the cellular automaton to canvas
   const drawToCanvas = useCallback(() => {
@@ -222,7 +222,7 @@ const CellularAutomatonGrid = ({
         }
       }
     }
-  }, [data, latticeWidth, lightconeLength, zoom, panX, panY, mode, displayMode, darkMode, aliveColor, deadColor, stateColors, savedRegexes, baseCellSize, getCellColor, getRegexColorForPosition, onPan]);
+  }, [data, latticeWidth, lightconeLength, zoom, panX, panY, displayMode, darkMode, baseCellSize, getCellColor, getRegexColorForPosition, onPan]);
 
   // Redraw when data or view parameters change
   useEffect(() => {

@@ -30,7 +30,6 @@ import {
   HelpOutline as HelpIcon
 } from '@mui/icons-material';
 import CellularAutomatonGrid from './components/CellularAutomatonGrid';
-import './components/CellularAutomatonGrid.css';
 
 // Elementary cellular automaton rule (e.g., Rule 30)
 const applyRule = (left: number, center: number, right: number, rule: number): number => {
