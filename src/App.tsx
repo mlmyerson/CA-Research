@@ -646,6 +646,15 @@ function App() {
         secondary: darkMode ? '#b0b0b0' : '#666666',
       },
     },
+    breakpoints: {
+      values: {
+        xs: 0,
+        sm: 600,
+        md: 900,
+        lg: 1200,
+        xl: 1536,
+      },
+    },
     components: {
       MuiAppBar: {
         styleOverrides: {
@@ -680,7 +689,12 @@ function App() {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+            <Typography variant="h6" noWrap component="div" sx={{ 
+              flexGrow: 1,
+              fontSize: { xs: '1rem', sm: '1.25rem' }, // Smaller font on mobile
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}>
               Elementary Cellular Automaton
             </Typography>
             <IconButton
@@ -704,15 +718,16 @@ function App() {
           }}
           sx={{
             '& .MuiDrawer-paper': {
-              width: 400,
+              width: { xs: '100vw', sm: 400 }, // Full width on mobile, 400px on larger screens
+              maxWidth: '100vw',
               boxSizing: 'border-box',
             },
           }}
         >
           <Toolbar />
-          <Box sx={{ overflow: 'auto' }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" p={2} pb={0}>
-              <Typography variant="h6">Controls</Typography>
+          <Box sx={{ overflow: 'auto', px: { xs: 1, sm: 0 } }}> {/* Reduced padding on mobile */}
+            <Box display="flex" justifyContent="space-between" alignItems="center" p={{ xs: 1, sm: 2 }} pb={0}>
+              <Typography variant="h6" sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>Controls</Typography>
               <IconButton onClick={toggleDrawer}>
                 <CloseIcon />
               </IconButton>
@@ -726,8 +741,8 @@ function App() {
                 {generalExpanded ? <ExpandLess /> : <ExpandMore />}
               </ListItemButton>
               <Collapse in={generalExpanded} timeout="auto" unmountOnExit>
-                <Box sx={{ px: 2, pb: 2 }}>
-                  <Paper elevation={2} sx={{ p: 3 }}>
+                <Box sx={{ px: { xs: 1, sm: 2 }, pb: 2 }}>
+                  <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 } }}>
                     <Grid container spacing={3}>
                       <Grid size={{ xs: 12 }}>
                         <FormControlLabel
@@ -773,16 +788,21 @@ function App() {
                           <ListItemButton onClick={toggleBinaryColors} sx={{ pl: 0, pr: 0 }}>
                             <ListItemText 
                               primary="Binary Colors"
-                              secondary={!binaryColorsExpanded ? `Alive: ${aliveColor} • Dead: ${deadColor}` : undefined}
+                              secondary={!binaryColorsExpanded ? `Alive/Dead Colors` : undefined}
+                              secondaryTypographyProps={{
+                                sx: { 
+                                  fontSize: { xs: '0.7rem', sm: '0.875rem' },
+                                }
+                              }}
                             />
                             {binaryColorsExpanded ? <ExpandLess /> : <ExpandMore />}
                           </ListItemButton>
                           <Collapse in={binaryColorsExpanded} timeout="auto" unmountOnExit>
                             <Box sx={{ pl: 2, pr: 2, pb: 2 }}>
                               <Grid container spacing={2}>
-                                <Grid size={{ xs: 6 }}>
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Typography variant="body2" sx={{ minWidth: '40px' }}>Alive:</Typography>
+                                <Grid size={{ xs: 12, sm: 6 }}> {/* Stack on mobile */}
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                                    <Typography variant="body2" sx={{ minWidth: { xs: '100%', sm: '40px' } }}>Alive:</Typography>
                                     <input
                                       type="color"
                                       value={aliveColor}
@@ -795,14 +815,17 @@ function App() {
                                         cursor: 'pointer'
                                       }}
                                     />
-                                    <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                                    <Typography variant="caption" sx={{ 
+                                      fontFamily: 'monospace',
+                                      fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                                    }}>
                                       {aliveColor}
                                     </Typography>
                                   </Box>
                                 </Grid>
-                                <Grid size={{ xs: 6 }}>
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Typography variant="body2" sx={{ minWidth: '40px' }}>Dead:</Typography>
+                                <Grid size={{ xs: 12, sm: 6 }}> {/* Stack on mobile */}
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                                    <Typography variant="body2" sx={{ minWidth: { xs: '100%', sm: '40px' } }}>Dead:</Typography>
                                     <input
                                       type="color"
                                       value={deadColor}
@@ -815,7 +838,10 @@ function App() {
                                         cursor: 'pointer'
                                       }}
                                     />
-                                    <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                                    <Typography variant="caption" sx={{ 
+                                      fontFamily: 'monospace',
+                                      fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                                    }}>
                                       {deadColor}
                                     </Typography>
                                   </Box>
@@ -832,6 +858,11 @@ function App() {
                             <ListItemText 
                               primary="State Colors"
                               secondary={!stateColorsExpanded ? `8 colors configured` : undefined}
+                              secondaryTypographyProps={{
+                                sx: { 
+                                  fontSize: { xs: '0.7rem', sm: '0.875rem' },
+                                }
+                              }}
                             />
                             {stateColorsExpanded ? <ExpandLess /> : <ExpandMore />}
                           </ListItemButton>
@@ -839,9 +870,9 @@ function App() {
                             <Box sx={{ pl: 2, pr: 2, pb: 2 }}>
                               <Grid container spacing={2}>
                                 {stateColors.map((color, index) => (
-                                  <Grid size={{ xs: 6 }} key={index}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                      <Typography variant="body2" sx={{ minWidth: '20px' }}>
+                                  <Grid size={{ xs: 12, sm: 6 }} key={index}> {/* Stack on mobile */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                                      <Typography variant="body2" sx={{ minWidth: { xs: '100%', sm: '20px' } }}>
                                         {index}:
                                       </Typography>
                                       <input
@@ -856,7 +887,10 @@ function App() {
                                           cursor: 'pointer'
                                         }}
                                       />
-                                      <Typography variant="caption" sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}>
+                                      <Typography variant="caption" sx={{ 
+                                        fontFamily: 'monospace', 
+                                        fontSize: { xs: '0.6rem', sm: '0.7rem' }
+                                      }}>
                                         {color}
                                       </Typography>
                                     </Box>
@@ -869,8 +903,8 @@ function App() {
                       )}
 
                       <Grid size={{ xs: 12 }}>
-                        <Grid container spacing={2}>
-                          <Grid size={{ xs: 4 }}>
+                        <Grid container spacing={1}> {/* Reduced spacing on mobile */}
+                          <Grid size={{ xs: 12, sm: 4 }}> {/* Stack on mobile */}
                             <Button
                               variant="outlined"
                               color="primary"
@@ -881,7 +915,7 @@ function App() {
                               Import
                             </Button>
                           </Grid>
-                          <Grid size={{ xs: 4 }}>
+                          <Grid size={{ xs: 12, sm: 4 }}> {/* Stack on mobile */}
                             <Button
                               variant="outlined"
                               color="primary"
@@ -892,7 +926,7 @@ function App() {
                               Save
                             </Button>
                           </Grid>
-                          <Grid size={{ xs: 4 }}>
+                          <Grid size={{ xs: 12, sm: 4 }}> {/* Stack on mobile */}
                             <Button
                               variant="outlined"
                               color="secondary"
@@ -925,13 +959,21 @@ function App() {
               <ListItemButton onClick={toggleParameters}>
                 <ListItemText 
                   primary="Parameters" 
-                  secondary={!parametersExpanded ? `Rule ${rule} • ${latticeWidth}×${lightconeLength} • ${mode}${toroidal ? ' • torus' : ''}${initialConditions ? ' • Custom Init' : ''}` : undefined}
+                  secondary={!parametersExpanded ? `Rule ${rule} • ${latticeWidth}×${lightconeLength}` : undefined}
+                  secondaryTypographyProps={{
+                    sx: { 
+                      fontSize: { xs: '0.7rem', sm: '0.875rem' },
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }
+                  }}
                 />
                 {parametersExpanded ? <ExpandLess /> : <ExpandMore />}
               </ListItemButton>
               <Collapse in={parametersExpanded} timeout="auto" unmountOnExit>
-                <Box sx={{ px: 2, pb: 2 }}>
-                  <Paper elevation={2} sx={{ p: 3 }}>
+                <Box sx={{ px: { xs: 1, sm: 2 }, pb: 2 }}>
+                  <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 } }}>
                     <Grid container spacing={3}>
                       <Grid size={{ xs: 12 }}>
                         <FormControlLabel 
@@ -1029,8 +1071,8 @@ function App() {
                 {regexExpanded ? <ExpandLess /> : <ExpandMore />}
               </ListItemButton>
               <Collapse in={regexExpanded} timeout="auto" unmountOnExit>
-                <Box sx={{ px: 2, pb: 2 }}>
-                  <Paper elevation={2} sx={{ p: 3 }}>
+                <Box sx={{ px: { xs: 1, sm: 2 }, pb: 2 }}>
+                  <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 } }}>
                     <Grid container spacing={3}>
                       <Grid size={{ xs: 12 }}>
                         <TextField
@@ -1043,7 +1085,7 @@ function App() {
                           helperText="Give your pattern a descriptive name"
                         />
                       </Grid>
-                      <Grid size={{ xs: 6 }}>
+                      <Grid size={{ xs: 12, sm: 6 }}> {/* Full width on mobile */}
                         <TextField
                           label="Enter Regex Pattern"
                           value={currentRegex}
@@ -1054,9 +1096,9 @@ function App() {
                           helperText="Enter a regular expression pattern"
                         />
                       </Grid>
-                      <Grid size={{ xs: 3 }}>
+                      <Grid size={{ xs: 6, sm: 3 }}> {/* Adjust mobile layout */}
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="body2">Color</Typography>
+                          <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Color</Typography>
                           <input
                             type="color"
                             value={currentRegexColor}
@@ -1071,7 +1113,7 @@ function App() {
                           />
                         </Box>
                       </Grid>
-                      <Grid size={{ xs: 3 }}>
+                      <Grid size={{ xs: 6, sm: 3 }}> {/* Adjust mobile layout */}
                         <Button
                           variant="contained"
                           onClick={saveRegex}
@@ -1200,10 +1242,12 @@ function App() {
           <Card
             sx={{
               position: 'fixed',
-              top: 64, // Below the toolbar
-              right: 16,
-              width: 400,
-              maxHeight: 'calc(100vh - 80px)',
+              top: { xs: 56, sm: 64 }, // Adjust for mobile toolbar height
+              right: { xs: 8, sm: 16 },
+              left: { xs: 8, sm: 'auto' }, // Full width on mobile
+              width: { xs: 'auto', sm: 400 }, // Responsive width
+              maxWidth: { xs: 'calc(100vw - 16px)', sm: 400 },
+              maxHeight: { xs: 'calc(100vh - 72px)', sm: 'calc(100vh - 80px)' },
               zIndex: (theme) => theme.zIndex.drawer + 2,
               boxShadow: 3,
               backgroundColor: darkMode ? '#1e1e1e' : '#ffffff',
@@ -1219,16 +1263,17 @@ function App() {
               sx={{
                 backgroundColor: darkMode ? '#333' : '#f5f5f5',
                 '& .MuiCardHeader-title': {
-                  fontSize: '1.1rem',
+                  fontSize: { xs: '1rem', sm: '1.1rem' },
                   fontWeight: 'bold'
                 }
               }}
             />
             <CardContent
               sx={{
-                maxHeight: 'calc(100vh - 150px)',
+                maxHeight: { xs: 'calc(100vh - 130px)', sm: 'calc(100vh - 150px)' },
                 overflow: 'auto',
-                p: 3,
+                p: { xs: 2, sm: 3 },
+                fontSize: { xs: '0.875rem', sm: '1rem' },
                 '&::-webkit-scrollbar': {
                   width: '8px',
                 },

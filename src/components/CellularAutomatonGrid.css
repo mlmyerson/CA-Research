@@ -1,9 +1,34 @@
 /* Cellular Automaton Grid Styles - Mobile Responsive */
 
+/* Base responsive styles */
+.cellular-automaton-grid {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 /* Additional responsive adjustments for mobile */
 @media (max-width: 768px) {
   .cellular-automaton-grid {
     max-width: 100%;
     overflow-x: auto;
+  }
+  
+  /* Ensure touch events work properly on mobile */
+  .cellular-automaton-grid canvas {
+    touch-action: none;
+  }
+}
+
+/* Adjustments for very small screens */
+@media (max-width: 480px) {
+  /* Ensure minimum touch target sizes */
+  button {
+    min-height: 44px;
+  }
+  
+  /* Improve text readability on small screens */
+  .MuiTypography-caption {
+    font-size: 0.65rem !important;
   }
 }

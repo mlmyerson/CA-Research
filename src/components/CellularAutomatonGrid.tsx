@@ -1,5 +1,6 @@
 import { Box } from '@mui/material';
 import { useState, useRef, useCallback, useEffect } from 'react';
+import './CellularAutomatonGrid.css';
 
 interface CellularAutomatonGridProps {
   /** Width of the lattice (number of cells horizontally) */
